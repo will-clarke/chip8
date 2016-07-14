@@ -1,11 +1,28 @@
-build_command = gcc -o a.out cpu.h
+CC				= gcc
+CFLAGS		= -Wall
+LDFLAGS		=
+OBJFILES	= main.o cpu.o
+TARGET		= chip8
+DEBUG     =
 
+all: $(TARGET)
 
-build: cpu.h
-	$(build_command)
+$(TARGET): $(OBJFILES)
+	$(CC) $(CFLAGS) $(DEBUG) -o $(TARGET) $(OBJFILES) $(LDFLAGS)
 
-debug: cpu.h
-	$(build_command) -DDEBUG
+debug: DEBUG = -DDEBUG
+debug: clean $(TARGET)
 
-test:
-	something
+%o: %c
+	$(CC) $(CFLAGS) $(DEBUG) -c $< $(LDFlAGS)
+# all: library.cpp main.cpp
+# In this case:
+# $@ evaluates to all
+# $< evaluates to library.cpp
+# $^ evaluates to library.cpp main.cpp
+
+clean:
+	rm -f $(TARGET) $(OBJFILES) *.log
+
+run: $(TARGET)
+	./$(TARGET)
