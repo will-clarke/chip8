@@ -12,7 +12,7 @@ struct cpu
   uint8_t keyboard[0xF];
 
   uint16_t I;
-  uint8_t pc;
+  uint16_t pc;
   uint8_t delay_timer;
   uint8_t sound_timer;
 };
@@ -25,6 +25,6 @@ struct cpu
 
 
 void init_cpu(struct cpu* cpu);
-void execute_opcode(uint16_t opcode);
+void execute_opcode(uint16_t opcode, struct cpu* cpu);
 
 #endif

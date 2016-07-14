@@ -1,0 +1,6 @@
+* Chip8 Todo List
+** tests!
+** load rom
+** configure keyboard input
+** configure ncurses
+** loads of remaining opcodes

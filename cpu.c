@@ -51,7 +51,7 @@ void init_cpu(struct cpu* cpu)
 
 
 
-void execute_opcode(uint16_t opcode)
+void execute_opcode(uint16_t opcode, struct cpu* cpu)
 {
 
   switch(opcode & 0xF000)
@@ -74,11 +74,14 @@ void execute_opcode(uint16_t opcode)
 
 
     case(0x1000):
+      {
       /* 1nnn - JP addr */
       /* Jump to location nnn. */
-
       /* The interpreter sets the program counter to nnn. */
-
+      uint16_t address = opcode & 0x0FFF;
+      cpu->pc = address;
+      break;
+      }
     case(0x2000):
 
       /* 2nnn - CALL addr */

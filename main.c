@@ -24,7 +24,11 @@ int main()
       if(step)
         getchar();
       uint16_t opcode = get_byte(cpu.memory, cpu.pc);
-      execute_opcode(opcode);
+#ifdef DEBUG
+      printf("opcode %d    = %0x4\n", count, opcode);
+      printf("  current pc = %d\n", cpu.pc);
+#endif
+      execute_opcode(opcode, &cpu);
 
       process_input(&cpu);
     }
