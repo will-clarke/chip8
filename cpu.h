@@ -1,3 +1,5 @@
+#ifndef CPU_H
+#define CPU_H
 #include <stdint.h>
 #include <string.h>
 
@@ -19,6 +21,10 @@ struct cpu
 
 /* Memory Map */
 /* ========= */
+// todo
 
 
 void init_cpu(struct cpu* cpu);
+void execute_opcode(uint16_t opcode);
+
+#endif

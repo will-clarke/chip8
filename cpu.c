@@ -251,6 +251,6 @@ void execute_opcode(uint16_t opcode)
 
       /* The interpreter reads values from memory starting at location I into registers V0 through Vx. */
     default:
-      printf("Opcode not found. Soz mate.");
+      printf("Opcode not found. Soz mate.\n");
     }
 }

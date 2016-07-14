@@ -1,7 +1,7 @@
 CC				= gcc
 CFLAGS		= -Wall
 LDFLAGS		=
-OBJFILES	= main.o cpu.o
+OBJFILES	= main.o cpu.o io.o
 TARGET		= chip8
 DEBUG     =
 
