@@ -8,7 +8,7 @@ SRCDIR    = src
 TESTDIR   = test
 SRCFILES  = $(wildcard $(SRCDIR)/*.c)
 OBJFILES  = $(patsubst $(SRCDIR)%.c,$(BUILDDIR)%.o,$(SRCFILES))
-TESTFILES = $(wildcard $(TESTDIR)/*.c)
+TESTFILES = $(wildcard $(TESTDIR)/*.cc)
 
 all: $(TARGET)
 
@@ -31,7 +31,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 .PHONY: test
 test: $(TESTFILES)
 	echo $(TESTFILES)
-	$(CC) $(CFLAGS) -lgtest $< $(LDFlAGS) -o $(TESTDIR)/$@
+	$(CC) $(CFLAGS) -I ~/.nix-profile/include -lgtest $< $(LDFlAGS) -o $(TESTDIR)/$@
 
 make_build_dir:
 	mkdir -p $(BUILDDIR)
