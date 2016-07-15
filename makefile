@@ -1,28 +1,43 @@
 CC				= gcc
 CFLAGS		= -Wall
 LDFLAGS		=
-OBJFILES	= main.o cpu.o io.o
 TARGET		= chip8
 DEBUG     =
+BUILDDIR  = build
+SRCDIR    = src
+TESTDIR   = test
+SRCFILES  = $(wildcard $(SRCDIR)/*.c)
+OBJFILES  = $(patsubst $(SRCDIR)%.c,$(BUILDDIR)%.o,$(SRCFILES))
+TESTFILES = $(wildcard $(TESTDIR)/*.c)
 
 all: $(TARGET)
 
-$(TARGET): $(OBJFILES)
+$(TARGET): make_build_dir $(OBJFILES) #make_build_dir $(OBJFILES)
 	$(CC) $(CFLAGS) $(DEBUG) -o $(TARGET) $(OBJFILES) $(LDFLAGS)
 
 debug: DEBUG = -DDEBUG
 debug: clean $(TARGET)
 
-%o: %c
-	$(CC) $(CFLAGS) $(DEBUG) -c $< $(LDFlAGS)
-# all: library.cpp main.cpp
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c
+	$(CC) $(CFLAGS) $(DEBUG) -c $< $(LDFlAGS) -o $@
+# Make Automatic Variables:
+# EG: `all: library.cpp main.cpp`
 # In this case:
 # $@ evaluates to all
 # $< evaluates to library.cpp
 # $^ evaluates to library.cpp main.cpp
 
+# TODO:
+.PHONY: test
+test: $(TESTFILES)
+	echo $(TESTFILES)
+	$(CC) $(CFLAGS) -lgtest $< $(LDFlAGS) -o $(TESTDIR)/$@
+
+make_build_dir:
+	mkdir -p $(BUILDDIR)
+
 clean:
-	rm -f $(TARGET) $(OBJFILES) *.log
+	rm -rf $(TARGET) $(BUILDDIR) *.log
 
 run: $(TARGET)
 	./$(TARGET)
