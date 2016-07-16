@@ -29,7 +29,8 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 
 .PHONY: test
 test: $(TESTFILES)
-	$(CC) $(CFLAGS) $^ $(LDFlAGS) -o $(TESTDIR)/$@ && ./$(TESTDIR)/$@
+	g++ -Wall -lgtest test/io.cc -o test/test && ./test/test
+	# $(CC) $(CFLAGS) -lstdc++ $^ $(LDFlAGS) -o $(TESTDIR)/$@ && ./$(TESTDIR)/$@
 
 make_build_dir:
 	mkdir -p $(BUILDDIR)
