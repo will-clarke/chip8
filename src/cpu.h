@@ -3,11 +3,18 @@
 #include <stdint.h>
 #include <string.h>
 
+struct stack
+{ uint16_t stack[0x10];
+  int8_t stack_pointer;};
+
+int stack_pop(struct stack*);
+int stack_push(struct stack*, uint16_t);
+
 struct cpu
 {
   uint8_t memory[0x1000];        // 4096
   uint8_t V[0x10];               // 16
-  uint8_t stack[0x10];           // 16
+  struct stack stack;
   uint8_t graphics[0x20 * 0x40]; // 32 * 64
   uint8_t keyboard[0x10];        // 16
 

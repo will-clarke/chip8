@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "cpu.h"
 
 void init_cpu(struct cpu* cpu)
 {
   memset( cpu->memory, 0, sizeof(cpu->memory) );
   memset( cpu->V, 0, sizeof(cpu->V) );
-  memset( cpu->stack, 0, sizeof(cpu->stack) );
+  memset( cpu->stack.stack, 0, sizeof(cpu->stack) );
+  cpu->stack.stack_pointer = 0;
   memset( cpu->graphics, 0, sizeof(cpu->graphics) );
   memset( cpu->keyboard, 0, sizeof(cpu->keyboard) );
   cpu->I = 0;
@@ -70,9 +72,14 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Clear the display. */
         case(0x00E0):
           memset(cpu->graphics, 0, sizeof(cpu->graphics));
+          break;
 
       /* 00EE - RET */
       /* Return from a subroutine. */
+        case(0x00EE):
+          cpu->pc = stack_pop(&(cpu->stack));
+          break;
+
 
       /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
 
@@ -260,4 +267,28 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
     default:
       printf("Opcode not found. Soz mate.\n");
     }
+}
+
+
+int stack_pop(struct stack* stack){
+  int number_to_return = *(stack->stack + stack->stack_pointer);
+  if(stack->stack_pointer >= 0)
+    stack->stack_pointer--;
+  else {
+    printf("Empty Stack Popped\n");
+    exit(1);
+  }
+  return number_to_return;
+}
+
+int stack_push(struct stack* stack, uint16_t n){
+  if(stack->stack_pointer < sizeof(stack->stack)) {
+    int stack_pointer = (stack->stack_pointer)++;
+    stack->stack[stack_pointer] = n;
+    return 1;
+  }
+  else {
+    printf("STACK OVERFLOW!\n");
+    return -1;
+  }
 }
