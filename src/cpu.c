@@ -5,11 +5,11 @@
 
 void init_cpu(struct cpu* cpu)
 {
-  memset( cpu->memory, '0', sizeof(cpu->memory) );
-  memset( cpu->V, '0', sizeof(cpu->V) );
-  memset( cpu->stack, '0', sizeof(cpu->stack) );
-  memset( cpu->graphics, '0', sizeof(cpu->graphics) );
-  memset( cpu->keyboard, '0', sizeof(cpu->keyboard) );
+  memset( cpu->memory, 0, sizeof(cpu->memory) );
+  memset( cpu->V, 0, sizeof(cpu->V) );
+  memset( cpu->stack, 0, sizeof(cpu->stack) );
+  memset( cpu->graphics, 0, sizeof(cpu->graphics) );
+  memset( cpu->keyboard, 0, sizeof(cpu->keyboard) );
   cpu->I = 0;
   cpu->pc = (uint8_t)0x2000;
   cpu->delay_timer = 0;
@@ -57,6 +57,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
   switch(opcode & 0xF000)
     {
     case(0x0000):
+      switch(opcode)
+        {
+
       /* 0nnn - SYS addr */
       /* Jump to a machine code routine at nnn. */
 
@@ -65,14 +68,15 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
 
       /* 00E0 - CLS */
       /* Clear the display. */
-
+        case(0x00E0):
+          memset(cpu->graphics, 0, sizeof(cpu->graphics));
 
       /* 00EE - RET */
       /* Return from a subroutine. */
 
       /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
 
-
+          }
     case(0x1000):
       {
       /* 1nnn - JP addr */
