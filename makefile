@@ -8,7 +8,7 @@ SRCDIR    = src
 TESTDIR   = test
 SRCFILES  = $(wildcard $(SRCDIR)/*.c)
 OBJFILES  = $(patsubst $(SRCDIR)%.c,$(BUILDDIR)%.o,$(SRCFILES))
-TESTFILES = $(wildcard $(TESTDIR)/*.cc)
+# TESTFILES = $(wildcard $(TESTDIR)/*.cc)
 
 all: $(TARGET)
 
@@ -27,11 +27,6 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 # $< evaluates to library.cpp
 # $^ evaluates to library.cpp main.cpp
 
-.PHONY: test
-test: $(TESTFILES)
-	g++ -Wall -lgtest test/io.cc -o test/test && ./test/test
-	# $(CC) $(CFLAGS) -lstdc++ $^ $(LDFlAGS) -o $(TESTDIR)/$@ && ./$(TESTDIR)/$@
-
 make_build_dir:
 	mkdir -p $(BUILDDIR)
 
@@ -40,3 +35,8 @@ clean:
 
 run: $(TARGET)
 	./$(TARGET)
+
+
+.PHONY: test
+test:
+	make -C $(TESTDIR)
