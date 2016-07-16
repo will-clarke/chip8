@@ -1,3 +1,2 @@
-int main()
-{
-}
+#include <gtest/gtest.h>
+#include <stdio.h>

@@ -27,17 +27,15 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 # $< evaluates to library.cpp
 # $^ evaluates to library.cpp main.cpp
 
-# TODO:
 .PHONY: test
 test: $(TESTFILES)
-	echo $(TESTFILES)
-	$(CC) $(CFLAGS) -I ~/.nix-profile/include -lgtest $< $(LDFlAGS) -o $(TESTDIR)/$@
+	$(CC) $(CFLAGS) $^ $(LDFlAGS) -o $(TESTDIR)/$@ && ./$(TESTDIR)/$@
 
 make_build_dir:
 	mkdir -p $(BUILDDIR)
 
 clean:
-	rm -rf $(TARGET) $(BUILDDIR) *.log
+	rm -rf $(TARGET) $(BUILDDIR) *.log test/test
 
 run: $(TARGET)
 	./$(TARGET)
