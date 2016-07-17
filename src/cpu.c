@@ -2,11 +2,13 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 #include "cpu.h"
 #include "io.h"
 
 void init_cpu(struct cpu* cpu)
 {
+  srand(time(0));
   memset( cpu->memory, 0, sizeof(cpu->memory) );
   memset( cpu->V, 0, sizeof(cpu->V) );
   memset( cpu->stack.stack, 0, sizeof(cpu->stack) );
@@ -310,118 +312,141 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       break;
     case(0x9000):
       {
-      /* 9xy0 - SNE Vx, Vy */
-      /* Skip next instruction if Vx != Vy. */
-      /* The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2. */
-      uint8_t x = (opcode & 0x0F00) >> 8;
-      uint8_t y = (opcode & 0x00F0) >> 4;
-      if(cpu->V[x] != cpu->V[y])
-        cpu->pc += 2;
-      else
-        cpu->pc++;
-      break;
+        /* 9xy0 - SNE Vx, Vy */
+        /* Skip next instruction if Vx != Vy. */
+        /* The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        if(cpu->V[x] != cpu->V[y])
+          cpu->pc += 2;
+        else
+          cpu->pc++;
+        break;
       }
     case(0xA000):
       {
-      /* Annn - LD I, addr */
-      /* Set I = nnn. */
-
-      /* The value of register I is set to nnn. */
-      break;
+        /* Annn - LD I, addr */
+        /* Set I = nnn. */
+        /* The value of register I is set to nnn. */
+        uint16_t nnn = (opcode & 0x0FFF);
+        cpu->I = nnn;
+        cpu->pc++;
+        break;
       }
     case(0xB000):
       {
-      /* Bnnn - JP V0, addr */
-      /* Jump to location nnn + V0. */
+        /* Bnnn - JP V0, addr */
+        /* Jump to location nnn + V0. */
 
-      /* The program counter is set to nnn plus the value of V0. */
-      break;
+        /* The program counter is set to nnn plus the value of V0. */
+        uint16_t nnn = (opcode & 0x0FFF);
+        cpu->pc = cpu->V[0] + nnn;
+        break;
       }
     case(0xC000):
       {
-      /* Cxkk - RND Vx, byte */
-      /* Set Vx = random byte AND kk. */
-
-      /* The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND. */
+        /* Cxkk - RND Vx, byte */
+        /* Set Vx = random byte AND kk. */
+        /* The interpreter generates a random number from 0 to 255,
+           which is then ANDed with the value kk. The results are
+           stored in Vx. See instruction 8xy2 for more information on AND. */
+        uint8_t random_number = (uint8_t)rand();
+        uint8_t v_register = (opcode & 0x0F00) >> 8;
+        uint8_t kk = (opcode & 0x00FF);
+        cpu->V[v_register] = random_number & kk;
+        cpu->pc++;
       }
     case(0xD000):
       {
-      /* Dxyn - DRW Vx, Vy, nibble */
-      /* Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. */
+        /* Dxyn - DRW Vx, Vy, nibble */
+        /* Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. */
 
-      /* The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip-8 screen and sprites. */
+        /* The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip-8 screen and sprites. */
 
 
       }
     case(0xE000):
       {
-      /* Ex9E - SKP Vx */
-      /* Skip next instruction if key with the value of Vx is pressed. */
+        switch(opcode & 0xE0FF){
+        case(0xE09E):{
+        /* Ex9E - SKP Vx */
+        /* Skip next instruction if key with
+           the value of Vx is pressed. */
+        /* Checks the keyboard, and if the key
+           corresponding to the value of Vx is
+           currently in the down position,
+           PC is increased by 2. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        if (cpu->keyboard[x])
+          cpu->pc += 2;
+        else
+          cpu->pc++;
+        break;
+        }
 
-      /* Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2. */
+        /* ExA1 - SKNP Vx */
+        /* Skip next instruction if key with the value of Vx is not pressed. */
+
+        /* Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2. */
 
 
-      /* ExA1 - SKNP Vx */
-      /* Skip next instruction if key with the value of Vx is not pressed. */
-
-      /* Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2. */
-
-
+        }
+        break;
       }
     case(0xF000):
       {
-      /* Fx07 - LD Vx, DT */
-      /* Set Vx = delay timer value. */
+        /* Fx07 - LD Vx, DT */
+        /* Set Vx = delay timer value. */
 
-      /* The value of DT is placed into Vx. */
-
-
-      /* Fx0A - LD Vx, K */
-      /* Wait for a key press, store the value of the key in Vx. */
-
-      /* All execution stops until a key is pressed, then the value of that key is stored in Vx. */
+        /* The value of DT is placed into Vx. */
 
 
-      /* Fx15 - LD DT, Vx */
-      /* Set delay timer = Vx. */
+        /* Fx0A - LD Vx, K */
+        /* Wait for a key press, store the value of the key in Vx. */
 
-      /* DT is set equal to the value of Vx. */
-
-
-      /* Fx18 - LD ST, Vx */
-      /* Set sound timer = Vx. */
-
-      /* ST is set equal to the value of Vx. */
+        /* All execution stops until a key is pressed, then the value of that key is stored in Vx. */
 
 
-      /* Fx1E - ADD I, Vx */
-      /* Set I = I + Vx. */
+        /* Fx15 - LD DT, Vx */
+        /* Set delay timer = Vx. */
 
-      /* The values of I and Vx are added, and the results are stored in I. */
-
-
-      /* Fx29 - LD F, Vx */
-      /* Set I = location of sprite for digit Vx. */
-
-      /* The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font. */
+        /* DT is set equal to the value of Vx. */
 
 
-      /* Fx33 - LD B, Vx */
-      /* Store BCD representation of Vx in memory locations I, I+1, and I+2. */
+        /* Fx18 - LD ST, Vx */
+        /* Set sound timer = Vx. */
 
-      /* The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2. */
-
-
-      /* Fx55 - LD [I], Vx */
-      /* Store registers V0 through Vx in memory starting at location I. */
-
-      /* The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I. */
+        /* ST is set equal to the value of Vx. */
 
 
-      /* Fx65 - LD Vx, [I] */
-      /* Read registers V0 through Vx from memory starting at location I. */
+        /* Fx1E - ADD I, Vx */
+        /* Set I = I + Vx. */
 
-      /* The interpreter reads values from memory starting at location I into registers V0 through Vx. */
+        /* The values of I and Vx are added, and the results are stored in I. */
+
+
+        /* Fx29 - LD F, Vx */
+        /* Set I = location of sprite for digit Vx. */
+
+        /* The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal font. */
+
+
+        /* Fx33 - LD B, Vx */
+        /* Store BCD representation of Vx in memory locations I, I+1, and I+2. */
+
+        /* The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2. */
+
+
+        /* Fx55 - LD [I], Vx */
+        /* Store registers V0 through Vx in memory starting at location I. */
+
+        /* The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I. */
+
+
+        /* Fx65 - LD Vx, [I] */
+        /* Read registers V0 through Vx from memory starting at location I. */
+
+        /* The interpreter reads values from memory starting at location I into registers V0 through Vx. */
       }
     default:
       printf("Opcode not found. Soz mate.\n");

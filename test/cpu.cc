@@ -250,6 +250,53 @@ TEST(OpCodeTest, 0x9xy0){
   EXPECT_EQ(cpu.pc, 2);
 }
 
+TEST(OpCodeTest, 0xAnnn){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0xA042, &cpu);
+  EXPECT_EQ(cpu.I, 0x42);
+}
+
+TEST(OpCodeTest, 0xBnnn){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0] = 2;
+  execute_opcode(0xB040, &cpu);
+  EXPECT_EQ(cpu.pc, 0x42);
+}
+
+TEST(OpCodeTest, 0xCxkk){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0xCA42, &cpu);
+  // HOW TO STUB RAND() IN C ??
+  // No idea....
+  // So I'm not going to test this.
+}
+
+TEST(OpCodeTest, Display){
+  // TODO
+}
+
+TEST(OpCodeTest, 0xEx9E){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.pc = 0;
+  execute_opcode(0xE59E, &cpu);
+  EXPECT_EQ(cpu.pc, 1);
+  cpu.keyboard[5] = 1;
+  cpu.pc = 0;
+  execute_opcode(0xE59E, &cpu);
+  EXPECT_EQ(cpu.pc, 2);
+}
+
+
+
+
+
+
+
+
 
 
 
