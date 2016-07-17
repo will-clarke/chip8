@@ -4,7 +4,7 @@ void process_input(struct cpu* cpu){
   // to implement
 }
 
-void clear_screen(int i)
+void clear_screen()
 {
   // noop yet
 }

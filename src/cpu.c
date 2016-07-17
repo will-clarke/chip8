@@ -71,7 +71,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Clear the display. */
         case(0x00E0):
           memset(cpu->graphics, 0, sizeof(cpu->graphics));
-          clear_screen(3);
+          clear_screen();
           break;
 
       /* 00EE - RET */
@@ -81,21 +81,26 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           cpu->pc = stack_pop(&(cpu->stack));
           break;
           }
+      break;
     case(0x1000): {
       /* 1nnn - JP addr */
       /* Jump to location nnn. */
       /* The interpreter sets the program counter to nnn. */
       uint16_t address = opcode & 0x0FFF;
       cpu->pc = address;
-      break;
       }
+      break;
     case(0x2000): {
       /* 2nnn - CALL addr */
       /* Call subroutine at nnn. */
-      /* The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn. */
+      /* The interpreter increments the stack pointer,
+         then puts the current PC on the top of the stack.
+         The PC is then set to nnn. */
       uint16_t nnn = opcode & 0x0FFF;
-      stack_push(&cpu->stack, nnn);
+      stack_push(&cpu->stack, cpu->pc);
+      cpu->pc = nnn;
     }
+      break;
     case(0x3000):{
       /* 3xkk - SE Vx, byte */
       /* Skip next instruction if Vx = kk. */
@@ -104,22 +109,27 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t kk = opcode & 0x00FF;
       cpu->V[x] = kk;
     }
+      break;
     case(0x4000):
       /* 4xkk - SNE Vx, byte */
       /* Skip next instruction if Vx != kk. */
       /* The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2. */
+      break;
     case(0x5000):
       /* 5xy0 - SE Vx, Vy */
       /* Skip next instruction if Vx = Vy. */
       /* The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2. */
+      break;
     case(0x6000):
       /* 6xkk - LD Vx, byte */
       /* Set Vx = kk. */
       /* The interpreter puts the value kk into register Vx. */
+      break;
     case(0x7000):
       /* 7xkk - ADD Vx, byte */
       /* Set Vx = Vx + kk. */
       /* Adds the value kk to the value of register Vx, then stores the result in Vx. */
+      break;
     case(0x8000):
       /* 8xy0 - LD Vx, Vy */
       /* Set Vx = Vy. */
@@ -173,20 +183,24 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Set Vx = Vx SHL 1. */
 
       /* If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2. */
+      break;
     case(0x9000):
       /* 9xy0 - SNE Vx, Vy */
       /* Skip next instruction if Vx != Vy. */
       /* The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2. */
+      break;
     case(0xA000):
       /* Annn - LD I, addr */
       /* Set I = nnn. */
 
       /* The value of register I is set to nnn. */
+      break;
     case(0xB000):
       /* Bnnn - JP V0, addr */
       /* Jump to location nnn + V0. */
 
       /* The program counter is set to nnn plus the value of V0. */
+      break;
     case(0xC000):
       /* Cxkk - RND Vx, byte */
       /* Set Vx = random byte AND kk. */

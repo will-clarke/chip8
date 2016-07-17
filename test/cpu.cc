@@ -17,11 +17,34 @@ TEST(CpuTests, InitCpu) {
 }
 
 TEST(OpCodeTest, 0x00EE){
+  /* Return from a subroutine. */
   struct cpu cpu;
   init_cpu(&cpu);
-  /* Return from a subroutine. */
+  cpu.stack.stack_pointer = 5;
+  cpu.stack.stack[4] = 2;
+  execute_opcode(0x00EE, &cpu);
+  EXPECT_EQ(cpu.stack.stack_pointer, 4);
+  EXPECT_EQ(cpu.pc, 2);
 }
 
+TEST(OpCodeTest, 0x1000)
+{
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0x1987, &cpu);
+  EXPECT_EQ(cpu.pc, 0x987);
+}
+
+TEST(OpCodeTest, 0x2000)
+{
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.pc = 42;
+  execute_opcode(0x2123, &cpu);
+  EXPECT_EQ(cpu.stack.stack_pointer, 1);
+  EXPECT_EQ(cpu.stack.stack[0], 42);
+  EXPECT_EQ(cpu.pc, 0x123);
+}
 TEST(OpCodeTest, 0x00E0)
 {
   struct cpu cpu;

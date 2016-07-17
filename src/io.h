@@ -3,6 +3,6 @@
 #include "cpu.h"
 
 void process_input(struct cpu*);
-void clear_screen(int);
+void clear_screen();
 
 #endif
