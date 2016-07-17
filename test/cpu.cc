@@ -45,6 +45,82 @@ TEST(OpCodeTest, 0x2000)
   EXPECT_EQ(cpu.stack.stack[0], 42);
   EXPECT_EQ(cpu.pc, 0x123);
 }
+
+TEST(OpCodeTest, 0x3000)
+{
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.pc = 0;
+  execute_opcode(0x3323, &cpu);
+  EXPECT_EQ(cpu.pc, 1);
+  cpu.pc = 0;
+  cpu.V[3] = 0x23;
+  execute_opcode(0x3323, &cpu);
+  EXPECT_EQ(cpu.pc, 2);
+}
+
+TEST(OpCodeTest, 0x4000)
+{
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.pc = 0;
+  execute_opcode(0x4123, &cpu);
+  EXPECT_EQ(cpu.pc, 2); // Not equal so jump 2
+  cpu.pc = 0;
+  cpu.V[1] = 0x23;
+  execute_opcode(0x4123, &cpu);
+  EXPECT_EQ(cpu.pc, 1); // Equal so jump 1
+}
+
+TEST(OpCodeTest, 0x5xy0){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.pc = 0;
+  execute_opcode(0x5120, &cpu);
+  // V[1] == v[2]
+  EXPECT_EQ(cpu.pc, 2);
+  cpu.pc = 0;
+  cpu.V[2] = 99;
+  execute_opcode(0x5120, &cpu);
+  // V[1] != v[2]
+  EXPECT_EQ(cpu.pc, 1);
+}
+
+TEST(OpCodeTest, 0x6xkk){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0x6720, &cpu);
+  EXPECT_EQ(cpu.V[7], 0x20);
+}
+
+TEST(OpCodeTest, 0x8xy0){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0x8B80, &cpu);
+  EXPECT_EQ(cpu.V[0xB], cpu.V[8]);
+  cpu.V[8] = 42;
+  execute_opcode(0x8B80, &cpu);
+  EXPECT_EQ(cpu.V[0xB], cpu.V[8]);
+}
+
+TEST(OpCodeTest, 0x7xkk){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0x7720, &cpu);
+  EXPECT_EQ(cpu.V[7], 0x20);
+  execute_opcode(0x7701, &cpu);
+  EXPECT_EQ(cpu.V[7], 0x21);
+}
+
+
+
+
+
+
+
+
+
+
 TEST(OpCodeTest, 0x00E0)
 {
   struct cpu cpu;

@@ -46,11 +46,20 @@ void init_cpu(struct cpu* cpu)
 
 
 
-/* nnn or addr - A 12-bit value, the lowest 12 bits of the instruction */
-/*   n or nibble - A 4-bit value, the lowest 4 bits of the instruction */
-/*   x - A 4-bit value, the lower 4 bits of the high byte of the instruction */
-/*   y - A 4-bit value, the upper 4 bits of the low byte of the instruction */
-/*   kk or byte - An 8-bit value, the lowest 8 bits of the instruction */
+/*   nnn or addr - A 12-bit value,
+     the lowest 12 bits of the instruction */
+
+/*   n or nibble - A 4-bit value,
+     the lowest 4 bits of the instruction */
+
+/*   x - A 4-bit value, the lower 4 bits
+     of the high byte of the instruction */
+
+/*   y - A 4-bit value, the upper 4 bits
+     of the low byte of the instruction */
+
+/*   kk or byte - An 8-bit value, the
+     lowest 8 bits of the instruction */
 
 
 
@@ -72,6 +81,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         case(0x00E0):
           memset(cpu->graphics, 0, sizeof(cpu->graphics));
           clear_screen();
+          cpu->pc++;
           break;
 
       /* 00EE - RET */
@@ -104,37 +114,83 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
     case(0x3000):{
       /* 3xkk - SE Vx, byte */
       /* Skip next instruction if Vx = kk. */
-      /* The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2. */
-      uint8_t x = (opcode & 0x0F00) << 2;
+      /* The interpreter compares register
+         Vx to kk, and if they are equal,
+         increments the program counter by 2. */
+      uint8_t x = (opcode & 0x0F00) >> 8;
       uint8_t kk = opcode & 0x00FF;
-      cpu->V[x] = kk;
+      char is_equal = cpu->V[x] == kk;
+      printf("pc = %d\n", cpu->pc);
+      if(is_equal)
+        cpu->pc += 2;
+      else
+        cpu->pc++;
     }
       break;
-    case(0x4000):
+    case(0x4000):{
       /* 4xkk - SNE Vx, byte */
       /* Skip next instruction if Vx != kk. */
-      /* The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2. */
+      /* The interpreter compares register
+         Vx to kk, and if they are not equal,
+         increments the program counter by 2. */
+      uint8_t x = (opcode & 0x0F00) >> 8;
+      uint8_t kk = opcode & 0x00FF;
+      char is_not_equal = cpu->V[x] != kk;
+      printf("pc = %d\n", cpu->pc);
+      if(is_not_equal)
+        cpu->pc += 2;
+      else
+        cpu->pc++;
       break;
-    case(0x5000):
+    }
+    case(0x5000):{
       /* 5xy0 - SE Vx, Vy */
       /* Skip next instruction if Vx = Vy. */
-      /* The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2. */
+      /* The interpreter compares
+         register Vx to register Vy,
+         and if they are equal, increments
+         the program counter by 2. */
+      uint8_t x, y;
+      x = (opcode & 0x0F00) >> 8;
+      y = (opcode & 0x00F0) >> 4;
+      if(cpu->V[x] == cpu->V[y])
+        cpu->pc += 2;
+      else
+        cpu->pc++;
       break;
-    case(0x6000):
+    }
+    case(0x6000):{
       /* 6xkk - LD Vx, byte */
       /* Set Vx = kk. */
-      /* The interpreter puts the value kk into register Vx. */
+      /* The interpreter puts the value
+         kk into register Vx. */
+      uint8_t _register = (opcode & 0x0F00) >> 8;
+      uint8_t value = opcode & 0x00FF;
+      cpu->V[_register] = value;
+      cpu->pc++;
       break;
-    case(0x7000):
+    }
+    case(0x7000):{
       /* 7xkk - ADD Vx, byte */
       /* Set Vx = Vx + kk. */
       /* Adds the value kk to the value of register Vx, then stores the result in Vx. */
-      break;
-    case(0x8000):
+      uint8_t _register = (opcode & 0x0F00) >> 8;
+      uint8_t value = opcode & 0x00FF;
+      cpu->V[_register] += value;
+      cpu->pc++;
+      break;}
+    case(0x8000):{
+      switch(opcode & 0x000F){
+      case(0x0): {
       /* 8xy0 - LD Vx, Vy */
       /* Set Vx = Vy. */
-
-      /* Stores the value of register Vy in register Vx. */
+      /* Stores the value of register
+         Vy in register Vx. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        cpu->V[x] = cpu->V[y];
+        cpu->pc++;
+        }
 
 
       /* 8xy1 - OR Vx, Vy */
@@ -183,6 +239,8 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Set Vx = Vx SHL 1. */
 
       /* If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2. */
+      }
+    }
       break;
     case(0x9000):
       /* 9xy0 - SNE Vx, Vy */
