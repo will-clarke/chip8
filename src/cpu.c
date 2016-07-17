@@ -290,11 +290,17 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         break;
       }
       case(0xE): {
+        uint8_t x = (opcode & 0x0F00) >> 8;
         /* 8xyE - SHL Vx {, Vy} */
         /* Set Vx = Vx SHL 1. */
         /* If the most-significant bit of Vx is 1,
            then VF is set to 1, otherwise to 0.
            Then Vx is multiplied by 2. */
+        if(cpu->V[x] >> 3)
+          cpu->V[0xF] = 1;
+        else
+          cpu->V[0xF] = 0;
+        cpu->V[x] = (cpu->V[x] << 1) & 0xF;
         break;
       }
       }

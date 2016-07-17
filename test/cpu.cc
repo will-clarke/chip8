@@ -220,21 +220,19 @@ TEST(OpCodeTest, 0x8xy7){
   EXPECT_EQ(cpu.V[0xF], 1);
 }
 
-
-
-// TEST(OpCodeTest, 0x8xyE){
+TEST(OpCodeTest, 0x8xyE){
 //   // SHL
-//   struct cpu cpu;
-//   init_cpu(&cpu);
-//   cpu.V[0xB] = 0b101;
-//   execute_opcode(0x8B8E, &cpu);
-//   EXPECT_EQ(cpu.V[0xF], 1);
-//   EXPECT_EQ(cpu.V[0xB], 0b10);
-//   cpu.V[0xB] = 0b1110;
-//   execute_opcode(0x8B8E, &cpu);
-//   EXPECT_EQ(cpu.V[0xF], 0);
-//   EXPECT_EQ(cpu.V[0xB], 0b111);
-// }
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 0b1010;
+  execute_opcode(0x8B8E, &cpu);
+  EXPECT_EQ(cpu.V[0xF], 1);
+  EXPECT_EQ(cpu.V[0xB], 0b10100 & 0xF);
+  cpu.V[0xB] = 0b10;
+  execute_opcode(0x8B8E, &cpu);
+  EXPECT_EQ(cpu.V[0xF], 0);
+  EXPECT_EQ(cpu.V[0xB], 0b100);
+}
 
 
 
