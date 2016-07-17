@@ -287,6 +287,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         else
           cpu->V[0xF] = 0;
         cpu->V[x] =  cpu->V[y] -  cpu->V[x];
+        cpu->pc++;
         break;
       }
       case(0xE): {
@@ -301,41 +302,59 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         else
           cpu->V[0xF] = 0;
         cpu->V[x] = (cpu->V[x] << 1) & 0xF;
+        cpu->pc++;
         break;
       }
       }
     }
       break;
     case(0x9000):
+      {
       /* 9xy0 - SNE Vx, Vy */
       /* Skip next instruction if Vx != Vy. */
       /* The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2. */
+      uint8_t x = (opcode & 0x0F00) >> 8;
+      uint8_t y = (opcode & 0x00F0) >> 4;
+      if(cpu->V[x] != cpu->V[y])
+        cpu->pc += 2;
+      else
+        cpu->pc++;
       break;
+      }
     case(0xA000):
+      {
       /* Annn - LD I, addr */
       /* Set I = nnn. */
 
       /* The value of register I is set to nnn. */
       break;
+      }
     case(0xB000):
+      {
       /* Bnnn - JP V0, addr */
       /* Jump to location nnn + V0. */
 
       /* The program counter is set to nnn plus the value of V0. */
       break;
+      }
     case(0xC000):
+      {
       /* Cxkk - RND Vx, byte */
       /* Set Vx = random byte AND kk. */
 
       /* The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND. */
+      }
     case(0xD000):
+      {
       /* Dxyn - DRW Vx, Vy, nibble */
       /* Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. */
 
       /* The interpreter reads n bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). Sprites are XORed onto the existing screen. If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen. See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip-8 screen and sprites. */
 
 
+      }
     case(0xE000):
+      {
       /* Ex9E - SKP Vx */
       /* Skip next instruction if key with the value of Vx is pressed. */
 
@@ -348,7 +367,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2. */
 
 
+      }
     case(0xF000):
+      {
       /* Fx07 - LD Vx, DT */
       /* Set Vx = delay timer value. */
 
@@ -401,6 +422,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Read registers V0 through Vx from memory starting at location I. */
 
       /* The interpreter reads values from memory starting at location I into registers V0 through Vx. */
+      }
     default:
       printf("Opcode not found. Soz mate.\n");
     }

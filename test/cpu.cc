@@ -234,6 +234,22 @@ TEST(OpCodeTest, 0x8xyE){
   EXPECT_EQ(cpu.V[0xB], 0b100);
 }
 
+TEST(OpCodeTest, 0x9xy0){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 42;
+  cpu.V[0x8] = 42;
+  cpu.pc = 0;
+  execute_opcode(0x9B80, &cpu);
+  //equal so don't skip
+  EXPECT_EQ(cpu.pc, 1);
+  cpu.V[0x8] = 41;
+  cpu.pc = 0;
+  execute_opcode(0x9B80, &cpu);
+  //not equal so skip pc + 2
+  EXPECT_EQ(cpu.pc, 2);
+}
+
 
 
 
