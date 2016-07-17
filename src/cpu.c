@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "cpu.h"
+#include "io.h"
 
 void init_cpu(struct cpu* cpu)
 {
@@ -61,10 +62,8 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
     case(0x0000):
       switch(opcode)
         {
-
       /* 0nnn - SYS addr */
       /* Jump to a machine code routine at nnn. */
-
       /* This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters. */
 
 
@@ -72,20 +71,17 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* Clear the display. */
         case(0x00E0):
           memset(cpu->graphics, 0, sizeof(cpu->graphics));
+          clear_screen(3);
           break;
 
       /* 00EE - RET */
       /* Return from a subroutine. */
+      /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
         case(0x00EE):
           cpu->pc = stack_pop(&(cpu->stack));
           break;
-
-
-      /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
-
           }
-    case(0x1000):
-      {
+    case(0x1000): {
       /* 1nnn - JP addr */
       /* Jump to location nnn. */
       /* The interpreter sets the program counter to nnn. */
@@ -93,16 +89,21 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       cpu->pc = address;
       break;
       }
-    case(0x2000):
-
+    case(0x2000): {
       /* 2nnn - CALL addr */
       /* Call subroutine at nnn. */
-
       /* The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn. */
-    case(0x3000):
+      uint16_t nnn = opcode & 0x0FFF;
+      stack_push(&cpu->stack, nnn);
+    }
+    case(0x3000):{
       /* 3xkk - SE Vx, byte */
       /* Skip next instruction if Vx = kk. */
       /* The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2. */
+      uint8_t x = (opcode & 0x0F00) << 2;
+      uint8_t kk = opcode & 0x00FF;
+      cpu->V[x] = kk;
+    }
     case(0x4000):
       /* 4xkk - SNE Vx, byte */
       /* Skip next instruction if Vx != kk. */

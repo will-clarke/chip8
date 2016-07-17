@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../src/cpu.c"
+#include "../src/io.c"
 
 TEST(CpuTests, InitCpu) {
   struct cpu cpu;
@@ -15,7 +16,13 @@ TEST(CpuTests, InitCpu) {
   EXPECT_EQ(*(cpu.keyboard + 15), 0);
 }
 
-TEST(CpuTests, 0x00E0)
+TEST(OpCodeTest, 0x00EE){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  /* Return from a subroutine. */
+}
+
+TEST(OpCodeTest, 0x00E0)
 {
   struct cpu cpu;
   memset(cpu.graphics, 'z', (int)sizeof(cpu.graphics));
