@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <limits.h>
 #include "../src/cpu.c"
 #include "../src/io.c"
 
@@ -93,6 +94,15 @@ TEST(OpCodeTest, 0x6xkk){
   EXPECT_EQ(cpu.V[7], 0x20);
 }
 
+TEST(OpCodeTest, 0x7xkk){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  execute_opcode(0x7720, &cpu);
+  EXPECT_EQ(cpu.V[7], 0x20);
+  execute_opcode(0x7701, &cpu);
+  EXPECT_EQ(cpu.V[7], 0x21);
+}
+
 TEST(OpCodeTest, 0x8xy0){
   struct cpu cpu;
   init_cpu(&cpu);
@@ -103,14 +113,131 @@ TEST(OpCodeTest, 0x8xy0){
   EXPECT_EQ(cpu.V[0xB], cpu.V[8]);
 }
 
-TEST(OpCodeTest, 0x7xkk){
+TEST(OpCodeTest, 0x8xy1){
+  // AND
   struct cpu cpu;
   init_cpu(&cpu);
-  execute_opcode(0x7720, &cpu);
-  EXPECT_EQ(cpu.V[7], 0x20);
-  execute_opcode(0x7701, &cpu);
-  EXPECT_EQ(cpu.V[7], 0x21);
+  execute_opcode(0x8B81, &cpu);
+  EXPECT_EQ(cpu.V[0xB], cpu.V[8]);
+  cpu.V[8] = 0b011001;
+  execute_opcode(0x8B81, &cpu);
+  EXPECT_EQ(cpu.V[0xB], cpu.V[8]);
+  cpu.V[8]    =  0b011001;
+  cpu.V[0xB]  =  0b101001;
+  int expected = 0b111001;
+  execute_opcode(0x8B81, &cpu);
+  EXPECT_EQ(cpu.V[0xB], expected);
 }
+
+TEST(OpCodeTest, 0x8xy2){
+  // OR
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 0;
+  cpu.V[8] = 0b011001;
+  execute_opcode(0x8B82, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 0);
+  cpu.V[0xB] = 0b011001;
+  cpu.V[8] = 0;
+  execute_opcode(0x8B82, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 0);
+  cpu.V[8]    =  0b011001;
+  cpu.V[0xB]  =  0b101001;
+  int expected = 0b001001;
+  execute_opcode(0x8B82, &cpu);
+  EXPECT_EQ(cpu.V[0xB], expected);
+}
+
+TEST(OpCodeTest, 0x8xy3){
+  // XOR
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 0b011001;
+  cpu.V[8]   = 0b011001;
+  execute_opcode(0x8B83, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 0);
+  cpu.V[0xB] = 0b110001;
+  cpu.V[8]   = 0b011001;
+  execute_opcode(0x8B83, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 0b101000);
+}
+
+TEST(OpCodeTest, 0x8xy4){
+  // ADD
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 5;
+  cpu.V[8]   = 5;
+  execute_opcode(0x8B84, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 10);
+  cpu.V[0xB] = 15;
+  cpu.V[8]   = 30;
+  execute_opcode(0x8B84, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 45);
+}
+
+TEST(OpCodeTest, 0x8xy5){
+  // SUB
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 50;
+  cpu.V[8]   = 5;
+  execute_opcode(0x8B85, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 45);
+  cpu.V[0xB] = 20;
+  cpu.V[8]   = 10;
+  execute_opcode(0x8B85, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 10);
+}
+
+TEST(OpCodeTest, 0x8xy6){
+  // SHR
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 0b101;
+  execute_opcode(0x8B86, &cpu);
+  EXPECT_EQ(cpu.V[0xF], 1);
+  EXPECT_EQ(cpu.V[0xB], 0b10);
+  cpu.V[0xB] = 0b1110;
+  execute_opcode(0x8B86, &cpu);
+  EXPECT_EQ(cpu.V[0xF], 0);
+  EXPECT_EQ(cpu.V[0xB], 0b111);
+}
+
+TEST(OpCodeTest, 0x8xy7){
+  // SUBN
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xB] = 0b11;
+  cpu.V[0x8] = 0b01;
+  execute_opcode(0x8B87, &cpu);
+  EXPECT_EQ(cpu.V[0xB], UCHAR_MAX - 1);
+  EXPECT_EQ(cpu.V[0xF], 0);
+  cpu.V[0xB] = 0b01;
+  cpu.V[0x8] = 0b11;
+  execute_opcode(0x8B87, &cpu);
+  EXPECT_EQ(cpu.V[0xB], 0b10);
+  EXPECT_EQ(cpu.V[0xF], 1);
+}
+
+
+
+// TEST(OpCodeTest, 0x8xyE){
+//   // SHL
+//   struct cpu cpu;
+//   init_cpu(&cpu);
+//   cpu.V[0xB] = 0b101;
+//   execute_opcode(0x8B8E, &cpu);
+//   EXPECT_EQ(cpu.V[0xF], 1);
+//   EXPECT_EQ(cpu.V[0xB], 0b10);
+//   cpu.V[0xB] = 0b1110;
+//   execute_opcode(0x8B8E, &cpu);
+//   EXPECT_EQ(cpu.V[0xF], 0);
+//   EXPECT_EQ(cpu.V[0xB], 0b111);
+// }
+
+
+
 
 
 

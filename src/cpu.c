@@ -71,26 +71,26 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
     case(0x0000):
       switch(opcode)
         {
-      /* 0nnn - SYS addr */
-      /* Jump to a machine code routine at nnn. */
-      /* This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters. */
+          /* 0nnn - SYS addr */
+          /* Jump to a machine code routine at nnn. */
+          /* This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters. */
 
 
-      /* 00E0 - CLS */
-      /* Clear the display. */
+          /* 00E0 - CLS */
+          /* Clear the display. */
         case(0x00E0):
           memset(cpu->graphics, 0, sizeof(cpu->graphics));
           clear_screen();
           cpu->pc++;
           break;
 
-      /* 00EE - RET */
-      /* Return from a subroutine. */
-      /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
+          /* 00EE - RET */
+          /* Return from a subroutine. */
+          /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
         case(0x00EE):
           cpu->pc = stack_pop(&(cpu->stack));
           break;
-          }
+        }
       break;
     case(0x1000): {
       /* 1nnn - JP addr */
@@ -98,7 +98,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       /* The interpreter sets the program counter to nnn. */
       uint16_t address = opcode & 0x0FFF;
       cpu->pc = address;
-      }
+    }
       break;
     case(0x2000): {
       /* 2nnn - CALL addr */
@@ -120,7 +120,6 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t x = (opcode & 0x0F00) >> 8;
       uint8_t kk = opcode & 0x00FF;
       char is_equal = cpu->V[x] == kk;
-      printf("pc = %d\n", cpu->pc);
       if(is_equal)
         cpu->pc += 2;
       else
@@ -136,7 +135,6 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t x = (opcode & 0x0F00) >> 8;
       uint8_t kk = opcode & 0x00FF;
       char is_not_equal = cpu->V[x] != kk;
-      printf("pc = %d\n", cpu->pc);
       if(is_not_equal)
         cpu->pc += 2;
       else
@@ -182,63 +180,123 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
     case(0x8000):{
       switch(opcode & 0x000F){
       case(0x0): {
-      /* 8xy0 - LD Vx, Vy */
-      /* Set Vx = Vy. */
-      /* Stores the value of register
-         Vy in register Vx. */
+        /* 8xy0 - LD Vx, Vy */
+        /* Set Vx = Vy. */
+        /* Stores the value of register
+           Vy in register Vx. */
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] = cpu->V[y];
         cpu->pc++;
-        }
+        break;
+      }
+      case(0x1): {
+        /* 8xy1 - OR Vx, Vy */
+        /* Set Vx = Vx OR Vy. */
+        /* Performs a bitwise OR on the values of Vx and Vy,
+           then stores the result in Vx. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        cpu->V[x] |= cpu->V[y];
+        cpu->pc++;
+        break;
+      }
 
+      case(0x2): {
+        /* 8xy2 - AND Vx, Vy */
+        /* Set Vx = Vx AND Vy. */
+        /* Performs a bitwise AND on the values of
+           Vx and Vy, then stores the result in Vx.
+           A bitwise AND compares the corrseponding bits
+           from two values, and if both bits are 1, then
+           the same bit in the result is also 1. Otherwise, it is 0. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        cpu->V[x] &= cpu->V[y];
+        cpu->pc++;
+        break;
+      }
+      case(0x3): {
+        /* 8xy3 - XOR Vx, Vy */
+        /* Set Vx = Vx XOR Vy. */
+        /* Performs a bitwise exclusive OR on the
+           values of Vx and Vy, then stores the result in Vx.
+           An exclusive OR compares the corrseponding bits from two values,
+           and if the bits are not both the same, then the corresponding bit
+           in the result is set to 1. Otherwise, it is 0. */
 
-      /* 8xy1 - OR Vx, Vy */
-      /* Set Vx = Vx OR Vy. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        cpu->V[x] ^= cpu->V[y];
+        cpu->pc++;
+        break;
+      }
+      case(0x4): {
+        /* 8xy4 - ADD Vx, Vy */
+        /* Set Vx = Vx + Vy, set VF = carry. */
+        /* The values of Vx and Vy are added together.
+           If the result is greater than 8 bits (i.e., > 255,)
+           VF is set to 1, otherwise 0.
+           Only the lowest 8 bits of the result are kept,
+           and stored in Vx. */
 
-      /* Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A bitwise OR compares the corrseponding bits from two values, and if either bit is 1, then the same bit in the result is also 1. Otherwise, it is 0. */
-
-
-      /* 8xy2 - AND Vx, Vy */
-      /* Set Vx = Vx AND Vy. */
-
-      /* Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx. A bitwise AND compares the corrseponding bits from two values, and if both bits are 1, then the same bit in the result is also 1. Otherwise, it is 0. */
-
-
-      /* 8xy3 - XOR Vx, Vy */
-      /* Set Vx = Vx XOR Vy. */
-
-      /* Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result in Vx. An exclusive OR compares the corrseponding bits from two values, and if the bits are not both the same, then the corresponding bit in the result is set to 1. Otherwise, it is 0. */
-
-
-      /* 8xy4 - ADD Vx, Vy */
-      /* Set Vx = Vx + Vy, set VF = carry. */
-
-      /* The values of Vx and Vy are added together. If the result is greater than 8 bits (i.e., > 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored in Vx. */
-
-
-      /* 8xy5 - SUB Vx, Vy */
-      /* Set Vx = Vx - Vy, set VF = NOT borrow. */
-
-      /* If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx. */
-
-
-      /* 8xy6 - SHR Vx {, Vy} */
-      /* Set Vx = Vx SHR 1. */
-
-      /* If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2. */
-
-
-      /* 8xy7 - SUBN Vx, Vy */
-      /* Set Vx = Vy - Vx, set VF = NOT borrow. */
-
-      /* If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx. */
-
-
-      /* 8xyE - SHL Vx {, Vy} */
-      /* Set Vx = Vx SHL 1. */
-
-      /* If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        cpu->V[x] += cpu->V[y];
+        cpu->pc++;
+        break;
+      }
+      case(0x5): {
+        /* 8xy5 - SUB Vx, Vy */
+        /* Set Vx = Vx - Vy, set VF = NOT borrow. */
+        /* If Vx > Vy, then VF is set to 1,
+           otherwise 0. Then Vy is subtracted from Vx,
+           and the results stored in Vx. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        cpu->V[x] -= cpu->V[y];
+        cpu->pc++;
+        break;
+      }
+      case(0x6): {
+        /* 8xy6 - SHR Vx {, Vy} */
+        /* Set Vx = Vx SHR 1. */
+        /* If the least-significant bit of Vx is 1,
+           then VF is set to 1, otherwise 0.
+           Then Vx is divided by 2. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        /* uint8_t y = (opcode & 0x00F0) >> 4; */
+        if (cpu->V[x] & 1)
+          cpu->V[0xF] = 1;
+        else
+          cpu->V[0xF] = 0;
+        cpu->V[x] /= 2;
+        cpu->pc++;
+        break;
+      }
+      case(0x7): {
+        /* 8xy7 - SUBN Vx, Vy */
+        /* Set Vx = Vy - Vx, set VF = NOT borrow. */
+        /* If Vy > Vx, then VF is set to 1, otherwise 0.
+           Then Vx is subtracted from Vy, and
+           the results stored in Vx. */
+        uint8_t x = (opcode & 0x0F00) >> 8;
+        uint8_t y = (opcode & 0x00F0) >> 4;
+        if(cpu->V[y] > cpu->V[x])
+          cpu->V[0xF] = 1;
+        else
+          cpu->V[0xF] = 0;
+        cpu->V[x] =  cpu->V[y] -  cpu->V[x];
+        break;
+      }
+      case(0xE): {
+        /* 8xyE - SHL Vx {, Vy} */
+        /* Set Vx = Vx SHL 1. */
+        /* If the most-significant bit of Vx is 1,
+           then VF is set to 1, otherwise to 0.
+           Then Vx is multiplied by 2. */
+        break;
+      }
       }
     }
       break;
@@ -347,7 +405,7 @@ int stack_pop(struct stack* stack){
   if(stack->stack_pointer > 0)
     return *(stack->stack + --stack->stack_pointer);
   else {
-    printf("Empty Stack Popped\n");
+    // printf("Empty Stack Popped\n");
     exit(1);
   }
 }
@@ -359,7 +417,7 @@ int stack_push(struct stack* stack, uint16_t n){
     return 1;
   }
   else {
-    printf("Stack Overflow!\n");
+    // printf("Stack Overflow!\n");
     exit(1);
   }
 }
