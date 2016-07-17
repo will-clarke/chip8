@@ -271,24 +271,22 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
 
 
 int stack_pop(struct stack* stack){
-  int number_to_return = *(stack->stack + stack->stack_pointer);
-  if(stack->stack_pointer >= 0)
-    stack->stack_pointer--;
+  if(stack->stack_pointer > 0)
+    return *(stack->stack + --stack->stack_pointer);
   else {
     printf("Empty Stack Popped\n");
     exit(1);
   }
-  return number_to_return;
 }
 
 int stack_push(struct stack* stack, uint16_t n){
-  if(stack->stack_pointer < sizeof(stack->stack)) {
-    int stack_pointer = (stack->stack_pointer)++;
-    stack->stack[stack_pointer] = n;
+  int stack_elems_count = (int)sizeof(stack->stack) / sizeof(stack->stack[0]);
+  if(stack->stack_pointer < stack_elems_count) {
+    stack->stack[stack->stack_pointer++] = n;
     return 1;
   }
   else {
-    printf("STACK OVERFLOW!\n");
-    return -1;
+    printf("Stack Overflow!\n");
+    exit(1);
   }
 }
