@@ -15,7 +15,7 @@ struct cpu
   uint8_t memory[0x1000];        // 4096
   uint8_t V[0x10];               // 16
   struct stack stack;
-  uint8_t graphics[0x20 * 0x40]; // 32 * 64
+  uint8_t display[0x20 * 0x40]; // 32 * 64
   uint8_t keyboard[0x10];        // 16
 
   uint16_t I;

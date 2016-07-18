@@ -2,6 +2,8 @@
 #include <limits.h>
 #include "../src/cpu.c"
 #include "../src/io.c"
+#include "../src/io.h"
+#include "../src/debug.c"
 
 TEST(CpuTests, InitCpu) {
   struct cpu cpu;
@@ -12,8 +14,8 @@ TEST(CpuTests, InitCpu) {
   EXPECT_EQ(cpu.sound_timer, 0);
   EXPECT_EQ(*(cpu.stack.stack + 15), 0);
   EXPECT_EQ(*(cpu.V + 15), 0);
-  EXPECT_EQ(*(cpu.graphics), 0);
-  EXPECT_EQ(*(cpu.graphics + 2047), 0);
+  EXPECT_EQ(*(cpu.display), 0);
+  EXPECT_EQ(*(cpu.display + 2047), 0);
   EXPECT_EQ(*(cpu.keyboard + 15), 0);
 }
 
@@ -274,8 +276,23 @@ TEST(OpCodeTest, 0xCxkk){
   // So I'm not going to test this.
 }
 
-TEST(OpCodeTest, Display){
-  // TODO
+// DISPLAY
+TEST(OpCodeTest, 0xDxyn){
+struct cpu cpu;
+ init_cpu(&cpu);
+ cpu.I = 129;
+ cpu.memory[129 + 0] = 'h';
+ cpu.memory[129 + 1] = 'e';
+ cpu.memory[129 + 2] = 'l';
+ cpu.memory[129 + 3] = 'l';
+ cpu.memory[129 + 4] = 'o';
+ execute_opcode(0xD595, &cpu);
+
+ EXPECT_EQ(cpu.display[5 * 9], 'h');
+ // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 1) + 9], 'e');
+ // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 2) + 9], 'l');
+ // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 2) + 9], 'l');
+ // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 3) + 9], 'o');
 }
 
 TEST(OpCodeTest, 0xEx9E){
@@ -283,27 +300,146 @@ TEST(OpCodeTest, 0xEx9E){
   init_cpu(&cpu);
   cpu.pc = 0;
   execute_opcode(0xE59E, &cpu);
+  // Not pressed so don't skip
   EXPECT_EQ(cpu.pc, 1);
   cpu.keyboard[5] = 1;
   cpu.pc = 0;
   execute_opcode(0xE59E, &cpu);
+  // Pressed so skip
   EXPECT_EQ(cpu.pc, 2);
 }
 
 
+TEST(OpCodeTest, 0xExA1){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.pc = 0;
+  execute_opcode(0xE5A1, &cpu);
+  EXPECT_EQ(cpu.pc, 2);
+  cpu.keyboard[0x5] = 1;
+  cpu.pc = 0;
+  execute_opcode(0xE5A1, &cpu);
+  EXPECT_EQ(cpu.pc, 1);
+}
+
+TEST(OpCodeTest, 0xFx07){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.delay_timer = 42;
+  execute_opcode(0xF907, &cpu);
+  EXPECT_EQ(cpu.V[9], 42);
+  cpu.delay_timer = 69;
+  execute_opcode(0xFC07, &cpu);
+  EXPECT_EQ(cpu.V[0xC], 69);
+}
+
+TEST(OpCodeTest, 0xFx0A){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.keyboard[0xB] = 0x01;
+  execute_opcode(0xF20A, &cpu);
+  EXPECT_EQ(cpu.V[2], 0xB);
+  cpu.keyboard[0xB] = 0;
+  cpu.keyboard[4] = 1;
+  execute_opcode(0xF20A, &cpu);
+  EXPECT_EQ(cpu.V[2], 4);
+}
+
+TEST(OpCodeTest, 0xFx15){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xA] = 42;
+  execute_opcode(0xFA15, &cpu);
+  EXPECT_EQ(cpu.delay_timer, 42);
+  cpu.V[1] = 123;
+  execute_opcode(0xF115, &cpu);
+  EXPECT_EQ(cpu.delay_timer, 123);
+}
+
+TEST(OpCodeTest, 0xFx18){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0xA] = 42;
+  execute_opcode(0xFA18, &cpu);
+  EXPECT_EQ(cpu.sound_timer, 42);
+  cpu.V[1] = 123;
+  execute_opcode(0xF118, &cpu);
+  EXPECT_EQ(cpu.sound_timer, 123);
+}
+
+TEST(OpCodeTest, 0xFx1E){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.I = 1000;
+  cpu.V[8] = 8;
+  execute_opcode(0xF81E, &cpu);
+  EXPECT_EQ(cpu.I, 1008);
+  execute_opcode(0xF81E, &cpu);
+  EXPECT_EQ(cpu.I, 1016);
+}
+
+TEST(OpCodeTest, 0xFx29){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[8] = 0xA;
+  execute_opcode(0xF829, &cpu);
+  EXPECT_EQ(cpu.memory[5 * 10 + 0], 0xF0);
+  EXPECT_EQ(cpu.memory[5 * 10 + 1], 0x90);
+  EXPECT_EQ(cpu.memory[5 * 10 + 2], 0xF0);
+  EXPECT_EQ(cpu.memory[5 * 10 + 3], 0x90);
+  EXPECT_EQ(cpu.memory[5 * 10 + 4], 0x90);
+    // 0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+}
 
 
+TEST(OpCodeTest, 0xFx33){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[4] = 250;
+  cpu.I = 15;
+  execute_opcode(0xF433, &cpu);
+  EXPECT_EQ(cpu.memory[15], 2);
+  EXPECT_EQ(cpu.memory[16], 5);
+  EXPECT_EQ(cpu.memory[17], 0);
+  cpu.V[9] = 123;
+  cpu.I = 93;
+  execute_opcode(0xF933, &cpu);
+  EXPECT_EQ(cpu.memory[93], 1);
+  EXPECT_EQ(cpu.memory[94], 2);
+  EXPECT_EQ(cpu.memory[95], 3);
+}
 
+TEST(OpCodeTest, 0xFx55){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.V[0] = 00;
+  cpu.V[1] = 10;
+  cpu.V[2] = 20;
+  cpu.V[3] = 30;
+  cpu.V[4] = 40;
+  cpu.I = 129;
+  execute_opcode(0xF455, &cpu);
+  EXPECT_EQ(cpu.memory[129 + 0], 00);
+  EXPECT_EQ(cpu.memory[129 + 1], 10);
+  EXPECT_EQ(cpu.memory[129 + 2], 20);
+  EXPECT_EQ(cpu.memory[129 + 3], 30);
+  EXPECT_EQ(cpu.memory[129 + 4], 40);
+}
 
-
-
-
-
-
-
-
-
-
+TEST(OpCodeTest, 0xFx65){
+  struct cpu cpu;
+  init_cpu(&cpu);
+  cpu.memory[129 + 0] = 'h';
+  cpu.memory[129 + 1] = 'e';
+  cpu.memory[129 + 2] = 'y';
+  cpu.memory[129 + 3] = '!';
+  cpu.I = 129;
+  execute_opcode(0xF365, &cpu);
+  EXPECT_EQ(cpu.V[0], 'h');
+  EXPECT_EQ(cpu.V[1], 'e');
+  EXPECT_EQ(cpu.V[2], 'y');
+  EXPECT_EQ(cpu.V[3], '!');
+}
 
 
 
@@ -312,11 +448,14 @@ TEST(OpCodeTest, 0xEx9E){
 TEST(OpCodeTest, 0x00E0)
 {
   struct cpu cpu;
-  memset(cpu.graphics, 'z', (int)sizeof(cpu.graphics));
+  memset(cpu.display, 'z', (int)sizeof(cpu.display));
   execute_opcode(0x00E0, &cpu);
-  EXPECT_EQ(*cpu.graphics, 0);
-  EXPECT_EQ(*(cpu.graphics + (int)sizeof(cpu.graphics) - 1), 0);
+  EXPECT_EQ(*cpu.display, 0);
+  EXPECT_EQ(*(cpu.display + (int)sizeof(cpu.display) - 1), 0);
 }
+
+
+
 
 TEST(CpuTests, stack_pop){
   struct stack my_stack;
