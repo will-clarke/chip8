@@ -283,7 +283,7 @@ struct cpu cpu;
  cpu.memory[7] = 'z';
  cpu.memory[8] = '!';
  cpu.memory[9] = 'Z';
- // cpu.memory[129 + 1] = 'e';
+ // cpu.display[64] = '2';
  execute_opcode(0xD00A, &cpu);
  EXPECT_EQ(cpu.display[0 * DISPLAY_W], 'h');
  EXPECT_EQ(cpu.display[1 * DISPLAY_W], 'e');
@@ -295,19 +295,14 @@ struct cpu cpu;
  EXPECT_EQ(cpu.display[7 * DISPLAY_W], 'z');
  EXPECT_EQ(cpu.display[8 * DISPLAY_W], '!');
  EXPECT_EQ(cpu.display[9 * DISPLAY_W], 'Z');
- // cpu.I = 129;
- // cpu.memory[129 + 0] = 'h';
- // cpu.memory[129 + 1] = 'e';
- // cpu.memory[129 + 2] = 'l';
- // cpu.memory[129 + 3] = 'l';
- // cpu.memory[129 + 4] = 'o';
- // execute_opcode(0xD595, &cpu);
+ EXPECT_EQ(cpu.V[0xF], 0);
 
- // EXPECT_EQ(cpu.display[5 * 9], 'h');
- // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 1) + 9], 'e');
- // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 2) + 9], 'l');
- // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 2) + 9], 'l');
- // EXPECT_EQ(cpu.display[(5 * DISPLAY_W + 3) + 9], 'o');
+
+ // to test next:
+ //==============
+ // xor collision
+ // differnt places
+ // % wrap around
 }
 
 TEST(OpCodeTest, 0xEx9E){
