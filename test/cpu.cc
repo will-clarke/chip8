@@ -3,6 +3,7 @@
 #include "../src/cpu.c"
 #include "../src/io.c"
 #include "../src/io.h"
+#include "../src/opcodes.c"
 #include "../src/debug.c"
 
 TEST(CpuTests, InitCpu) {

@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "io.h"
+#include "opcodes.h"
 #include <stdio.h>
 
 int main()
