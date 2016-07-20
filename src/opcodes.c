@@ -334,7 +334,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t n = (opcode & 0x000F);
         /* uint8_t tmp_display[DISPLAY_W * DISPLAY_H]; */
         uint8_t tmp_display[DISPLAY_W * DISPLAY_H];
-        /* uint8_t collision = 0; */
+        uint8_t collision = 0;
 
         printf("n = %d\n", n);
         for(int i = 0; i < n; i++){
@@ -345,15 +345,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           printf("- Row = %d, Col = %D, Row + col = %d. x=%d,y=%d,i=%d\n",row, col, row + col, x,y,i);
           uint16_t memory_for_display = cpu->memory[cpu->I + i];
 
-          tmp_display[display_x_y] = memory_for_display;
+          /* tmp_display[display_x_y] = memory_for_display; */
           cpu->display[display_x_y] = memory_for_display; //get rid of this line!!
           printf("char: %c -> location %d => %c\n", memory_for_display, display_x_y, tmp_display[display_x_y]);
-
-
-
-
-
-
 
 
           /* if((tmp_display[display_x_y] & cpu->display[display_x_y]) > 0) */
@@ -366,13 +360,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           // just erasing? or changing???
           // no idea if this will work.. I think it should in theory
         }
-        memcpy(&cpu->display[cpu->I], tmp_display, n);
-        /* tmp_display[0] = 'g'; */
-        printf("tmp_display[0] = %d \n",tmp_display[0]);
-        printf("tmp_display[1] = %d \n",tmp_display[DISPLAY_W]);
-        printf("tmp_display[2] = %d \n",tmp_display[2 * DISPLAY_W]);
-        memcpy(&(cpu->display[cpu->I]), tmp_display, n);
-        /* cpu->V[0xF] = collision; */
+        cpu->V[0xF] = collision;
         break;
         // more stuff to add in:
         // wrapping. % somewhere
