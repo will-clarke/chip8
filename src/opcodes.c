@@ -329,20 +329,16 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
            pixels to be erased, VF is set to 1, otherwise it is set to 0.
            If the sprite is positioned so part of it is outside the coordinates
            of the display, it wraps around to the opposite side of the screen.*/
-        uint8_t x = (opcode & 0x0F00) >> 8;
-        uint8_t y = (opcode & 0x00F0) >> 4;
+        uint8_t x = cpu->V[(opcode & 0x0F00) >> 8];
+        uint8_t y = cpu->V[(opcode & 0x00F0) >> 4];
         uint8_t n = (opcode & 0x000F);
         uint8_t collision = 0;
 
-        /* printf("n = %d\n", n); */
         for(int i = 0; i < n; i++){
           uint16_t row = ((y * DISPLAY_W) + (i * DISPLAY_W)) % (DISPLAY_W * DISPLAY_H);
           uint16_t col = x % DISPLAY_W;
           uint16_t display_x_y = row + col;
-
           uint16_t memory_for_display = cpu->memory[cpu->I + i];
-          /* printf("- Row = %d, Col = %D, Row + col = %d. x=%d,y=%d,i=%d - c=%c\n",row, col, row + col, x,y,i, memory_for_display); */
-
           uint8_t the_actual_xor = cpu->display[display_x_y] ^= memory_for_display;
           uint8_t xor_collision = the_actual_xor != memory_for_display;
           if(xor_collision)
@@ -350,8 +346,6 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         }
         cpu->V[0xF] = collision;
         break;
-        // more stuff to add in:
-        // wrapping. % somewhere
       }
     case(0xE000):
       {

@@ -273,6 +273,9 @@ TEST(OpCodeTest, 0xDxyn){
 struct cpu cpu;
  init_cpu(&cpu);
  cpu.I = 0;
+ cpu.V[0x3] = 0;
+ cpu.V[0x4] = 0;
+ cpu.I = 0;
  cpu.memory[0] = 'h';
  cpu.memory[1] = 'e';
  cpu.memory[2] = 'y';
@@ -283,8 +286,7 @@ struct cpu cpu;
  cpu.memory[7] = 'z';
  cpu.memory[8] = '!';
  cpu.memory[9] = 'Z';
- // cpu.display[64] = '2';
- execute_opcode(0xD00A, &cpu);
+ execute_opcode(0xD34A, &cpu);
  EXPECT_EQ(cpu.display[0 * DISPLAY_W], 'h');
  EXPECT_EQ(cpu.display[1 * DISPLAY_W], 'e');
  EXPECT_EQ(cpu.display[2 * DISPLAY_W], 'y');
@@ -297,12 +299,40 @@ struct cpu cpu;
  EXPECT_EQ(cpu.display[9 * DISPLAY_W], 'Z');
  EXPECT_EQ(cpu.V[0xF], 0);
 
+ // testing xoring && v[0xf]
+ init_cpu(&cpu);
+ cpu.I = 242;
+ cpu.V[0xD] = 0xD; //W
+ cpu.V[7] = 2;     // H
+ cpu.memory[242] = 'T';
+ cpu.memory[243] = 'o';
+ cpu.memory[244] = 's';
+ cpu.memory[245] = 'k';
+ cpu.display[141 + (DISPLAY_W * 1)] = 0b00010000;
+ execute_opcode(0xDD74,&cpu);
+ EXPECT_EQ(cpu.display[141], 'T');
+ EXPECT_EQ(cpu.display[141 + (DISPLAY_W * 1)], 127);
+ EXPECT_EQ(cpu.display[141 + (DISPLAY_W * 2)], 's');
+ EXPECT_EQ(cpu.display[141 + (DISPLAY_W * 3)], 'k');
+ EXPECT_EQ(cpu.V[0xF], 1);
 
- // to test next:
- //==============
- // xor collision
- // differnt places
- // % wrap around
+ // testing wrapping
+ init_cpu(&cpu);
+ cpu.I = 87;
+ cpu.V[0xD] = DISPLAY_W - 4;
+ cpu.V[7] = DISPLAY_H - 2;
+ uint16_t total = DISPLAY_W * DISPLAY_H;
+ cpu.memory[87] = 'T';
+ cpu.memory[88] = 'o';
+ cpu.memory[89] = 's';
+ cpu.memory[90] = 'k';
+ cpu.memory[91] = '!';
+ execute_opcode(0xDD75,&cpu);
+ EXPECT_EQ(cpu.display[total - (1 * DISPLAY_W) - 4], 'T');
+ EXPECT_EQ(cpu.display[total + (0 * DISPLAY_W) - 4], 'o');
+ EXPECT_EQ(cpu.display[0 + (1 * DISPLAY_W) - 4], 's');
+ EXPECT_EQ(cpu.display[0 + (2 * DISPLAY_W) - 4], 'k');
+ EXPECT_EQ(cpu.V[0xF], 0);
 }
 
 TEST(OpCodeTest, 0xEx9E){
