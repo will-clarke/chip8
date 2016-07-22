@@ -1,2 +1,2 @@
 all:
-	g++ -Wall -DDEBUG -lgtest main.cc -o test && ./test
+	g++ -Wall -DDEBUG -lncurses -lgtest main.cc -o test && ./test

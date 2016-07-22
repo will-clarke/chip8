@@ -16,8 +16,8 @@ void init_cpu(struct cpu* cpu)
   cpu->stack.stack_pointer = 0;
   memset( cpu->display, 0, sizeof(cpu->display) );
   memset( cpu->keyboard, 0, sizeof(cpu->keyboard) );
-  cpu->I = 0;
-  cpu->pc = (uint8_t)0x2000;
+  cpu->I = 0x0;
+  cpu->pc = 0x200;
   cpu->delay_timer = 0;
   cpu->sound_timer = 0;
   uint8_t fonts[80] = { 0xF0, 0x90, 0x90, 0x90, 0xF0, //0
@@ -67,5 +67,21 @@ int stack_push(struct stack* stack, uint16_t n){
   else {
     // printf("Stack Overflow!\n");
     exit(1);
+  }
+}
+
+uint16_t get_byte(uint8_t *memory, uint16_t pointer_to_memory)
+{
+  return *(memory + pointer_to_memory) << 8 | *(memory + pointer_to_memory + 1);
+}
+
+void decrease_timers(struct cpu* cpu){
+  if(cpu->delay_timer > 0)
+    (cpu->delay_timer)--;
+  if(cpu->sound_timer > 0){
+    (cpu->sound_timer)--;
+    if(cpu->sound_timer == 0)
+      printf("\a");
+    // BEEP!
   }
 }

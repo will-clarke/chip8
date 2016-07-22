@@ -1,7 +1,3 @@
 * Chip8 Todo List
-** Add build / src directories & configure makefile for them...
-** tests!
-** load rom
 ** configure keyboard input
 ** configure ncurses
-** loads of remaining opcodes

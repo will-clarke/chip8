@@ -7,6 +7,11 @@
 #include "cpu.h"
 #include "io.h"
 
+
+void increment_pc(struct cpu* cpu, int n){
+  cpu->pc += n * 2;
+}
+
 /*   nnn or addr - A 12-bit value,
      the lowest 12 bits of the instruction */
 
@@ -22,8 +27,6 @@
 /*   kk or byte - An 8-bit value, the
      lowest 8 bits of the instruction */
 
-
-
 void execute_opcode(uint16_t opcode, struct cpu* cpu)
 {
 #ifdef DEBUG
@@ -38,13 +41,12 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* Jump to a machine code routine at nnn. */
           /* This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters. */
 
-
           /* 00E0 - CLS */
           /* Clear the display. */
         case(0x00E0):
           memset(cpu->display, 0, sizeof(cpu->display));
           clear_screen();
-          cpu->pc++;
+          increment_pc(cpu, 1);
           break;
 
           /* 00EE - RET */
@@ -84,9 +86,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t kk = opcode & 0x00FF;
       char is_equal = cpu->V[x] == kk;
       if(is_equal)
-        cpu->pc += 2;
+        increment_pc(cpu, 2);
       else
-        cpu->pc++;
+        increment_pc(cpu, 1);
     }
       break;
     case(0x4000):{
@@ -99,9 +101,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t kk = opcode & 0x00FF;
       char is_not_equal = cpu->V[x] != kk;
       if(is_not_equal)
-        cpu->pc += 2;
+        increment_pc(cpu, 2);
       else
-        cpu->pc++;
+        increment_pc(cpu, 1);
       break;
     }
     case(0x5000):{
@@ -115,9 +117,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       x = (opcode & 0x0F00) >> 8;
       y = (opcode & 0x00F0) >> 4;
       if(cpu->V[x] == cpu->V[y])
-        cpu->pc += 2;
+        increment_pc(cpu, 2);
       else
-        cpu->pc++;
+        increment_pc(cpu, 1);
       break;
     }
     case(0x6000):{
@@ -128,7 +130,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t _register = (opcode & 0x0F00) >> 8;
       uint8_t value = opcode & 0x00FF;
       cpu->V[_register] = value;
-      cpu->pc++;
+      increment_pc(cpu, 1);
       break;
     }
     case(0x7000):{
@@ -138,7 +140,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
       uint8_t _register = (opcode & 0x0F00) >> 8;
       uint8_t value = opcode & 0x00FF;
       cpu->V[_register] += value;
-      cpu->pc++;
+      increment_pc(cpu, 1);
       break;}
     case(0x8000):{
       switch(opcode & 0x000F){
@@ -150,7 +152,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] = cpu->V[y];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0x1): {
@@ -161,7 +163,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] |= cpu->V[y];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
 
@@ -176,7 +178,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] &= cpu->V[y];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0x3): {
@@ -191,7 +193,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] ^= cpu->V[y];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0x4): {
@@ -206,7 +208,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] += cpu->V[y];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0x5): {
@@ -218,7 +220,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         cpu->V[x] -= cpu->V[y];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0x6): {
@@ -234,7 +236,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         else
           cpu->V[0xF] = 0;
         cpu->V[x] /= 2;
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0x7): {
@@ -250,7 +252,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         else
           cpu->V[0xF] = 0;
         cpu->V[x] =  cpu->V[y] -  cpu->V[x];
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       case(0xE): {
@@ -265,7 +267,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         else
           cpu->V[0xF] = 0;
         cpu->V[x] = (cpu->V[x] << 1) & 0xF;
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
       }
@@ -279,9 +281,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t x = (opcode & 0x0F00) >> 8;
         uint8_t y = (opcode & 0x00F0) >> 4;
         if(cpu->V[x] != cpu->V[y])
-          cpu->pc += 2;
+        increment_pc(cpu, 2);
         else
-          cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
     case(0xA000):
@@ -291,7 +293,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         /* The value of register I is set to nnn. */
         uint16_t nnn = (opcode & 0x0FFF);
         cpu->I = nnn;
-        cpu->pc++;
+        increment_pc(cpu, 1);
         break;
       }
     case(0xB000):
@@ -315,7 +317,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t v_register = (opcode & 0x0F00) >> 8;
         uint8_t kk = (opcode & 0x00FF);
         cpu->V[v_register] = random_number & kk;
-        cpu->pc++;
+        increment_pc(cpu, 1);
       }
     case(0xD000):
       {
@@ -345,6 +347,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
             collision = xor_collision;
         }
         cpu->V[0xF] = collision;
+        increment_pc(cpu, 1);
         break;
       }
     case(0xE000):
@@ -361,9 +364,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           uint8_t x = (opcode & 0x0F00) >> 8;
           if (cpu->keyboard[x])
             // if key is pressed
-            cpu->pc += 2;
+            increment_pc(cpu, 2);
           else
-            cpu->pc += 1;
+            increment_pc(cpu, 1);
           break;
         }
 
@@ -376,9 +379,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           uint8_t x = (opcode & 0x0F00) >> 8;
           if (cpu->keyboard[x])
             // if key is pressed
-            cpu->pc += 1;
+            increment_pc(cpu, 1);
           else
-            cpu->pc += 2;
+            increment_pc(cpu, 2);
           break;
         }
         }
@@ -395,6 +398,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* The value of DT is placed into Vx. */
           uint8_t x = (opcode & 0x0F00) >> 8;
           cpu->V[x] = cpu->delay_timer;
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF00A): {
@@ -413,6 +417,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
             }
             key_number++;
             key_number %= 0xF;
+            increment_pc(cpu, 1);
           }
           break;
         }
@@ -422,6 +427,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* DT is set equal to the value of Vx. */
           uint8_t x = (opcode & 0x0F00) >> 8;
           cpu->delay_timer = cpu->V[x];
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF018): {
@@ -430,6 +436,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* ST is set equal to the value of Vx. */
           uint8_t x = (opcode & 0x0F00) >> 8;
           cpu->sound_timer = cpu->V[x];
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF01E): {
@@ -439,6 +446,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
              and the results are stored in I. */
           uint8_t x = (opcode & 0x0F00) >> 8;
           cpu->I += x;
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF029): {
@@ -449,6 +457,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
              to the value of Vx. */
           uint8_t x = (opcode & 0x0F00) >> 8;
           cpu->I = (5 * 8) *  (cpu->V[x] - 1);
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF033): {
@@ -464,6 +473,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           cpu->memory[cpu->I]     = (digits % 1000)  / 100;
           cpu->memory[cpu->I + 1] = (digits % 100)   / 10;
           cpu->memory[cpu->I + 2] = (digits % 10)    / 1;
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF055): {
@@ -480,6 +490,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
             cpu->memory[cpu->I + i] = cpu->V[i];
             /* printf("mem[%d] = %d\n", cpu->I + i, cpu->V[i]); */
           }
+          increment_pc(cpu, 1);
           break;
         }
         case(0xF065): {
@@ -493,6 +504,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           for(int i = 0; i <= x; i++){
             cpu->V[i] = cpu->memory[cpu->I + i];
           }
+          increment_pc(cpu, 1);
           break;
         }
         }

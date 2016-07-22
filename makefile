@@ -1,6 +1,6 @@
 CC				= gcc
 CFLAGS		= -Wall
-LDFLAGS		=
+LDFLAGS		= -lncurses
 TARGET		= chip8
 DEBUG     =
 BUILDDIR  = build
@@ -34,7 +34,7 @@ clean:
 	rm -rf $(TARGET) $(BUILDDIR) *.log test/test
 
 run: $(TARGET)
-	./$(TARGET)
+	./$(TARGET) PONG
 
 
 .PHONY: test

@@ -13,8 +13,3 @@ void dump_memory(struct cpu* cpu)
     fprintf(log, "Mem byte %4.d : %04x\n", i, byte);
   }
 }
-
-uint16_t get_byte(uint8_t *memory, uint8_t pointer_to_memory)
-{
-  return *(memory + pointer_to_memory) << 8 | *(memory + pointer_to_memory + 1);
-}
