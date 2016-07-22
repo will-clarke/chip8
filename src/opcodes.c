@@ -44,7 +44,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* 00E0 - CLS */
           /* Clear the display. */
         case(0x00E0):
-          memset(cpu->display, 0, sizeof(cpu->display));
+          /* memset(cpu->display, 0, sizeof(cpu->display)); */
           clear_screen();
           increment_pc(cpu, 1);
           break;
@@ -339,7 +339,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         for(int i = 0; i < n; i++){
           uint16_t row = ((y * DISPLAY_W) + (i * DISPLAY_W)) % (DISPLAY_W * DISPLAY_H);
           uint16_t col = x % DISPLAY_W;
-          uint16_t display_x_y = row + col;
+          uint16_t display_x_y = row + col % (DISPLAY_W * DISPLAY_H);
           uint16_t memory_for_display = cpu->memory[cpu->I + i];
           uint8_t the_actual_xor = cpu->display[display_x_y] ^= memory_for_display;
           uint8_t xor_collision = the_actual_xor != memory_for_display;
@@ -456,7 +456,8 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
              for the hexadecimal sprite corresponding
              to the value of Vx. */
           uint8_t x = (opcode & 0x0F00) >> 8;
-          cpu->I = (5 * 8) *  (cpu->V[x] - 1);
+          /* cpu->I = (5 * 8) *  (cpu->V[x] - 1); */
+          cpu->I = cpu->V[x];
           increment_pc(cpu, 1);
           break;
         }

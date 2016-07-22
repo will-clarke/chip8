@@ -55,7 +55,7 @@ void process_keyboard_input(struct cpu* cpu){
   case('2'): cpu->keyboard[0x2] = 1; break;
   case('3'): cpu->keyboard[0x2] = 1; break;
   case('4'): cpu->keyboard[0x2] = 1; break;
-  case('q'): cpu->keyboard[0x2] = 1; break;
+  /* case('q'): cpu->keyboard[0x2] = 1; break; */
   case('w'): cpu->keyboard[0x2] = 1; break;
   case('e'): cpu->keyboard[0x2] = 1; break;
   case('r'): cpu->keyboard[0x2] = 1; break;
@@ -67,6 +67,7 @@ void process_keyboard_input(struct cpu* cpu){
   case('x'): cpu->keyboard[0x2] = 1; break;
   case('c'): cpu->keyboard[0x2] = 1; break;
   case('v'): cpu->keyboard[0x2] = 1; break;
+  case('q'):
   case('*'): end_ncurses(); exit(0);
 #ifdef DEBUG
   case('='): {
@@ -85,7 +86,7 @@ void output_display(WINDOW * window, struct cpu* cpu){
   clear();
   for(int i = 0; i < (int)sizeof(cpu->display); i++){
     if(cpu->display[i])
-      mvwaddch(window, i / DISPLAY_H, i % DISPLAY_W, 178);
+      mvwaddch(window, i / DISPLAY_H, i % DISPLAY_W, '#');
                              /* y, x */
   }
   refresh();

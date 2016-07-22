@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
       fprintf(running_log, "opcode %d    = %0x\n", count, opcode);
       fprintf(running_log, "  current pc = %d\n", cpu.pc);
       fprintf(running_log, "  Stepping enabled? = %d\n", cpu.stepping.stepping);
+      fprintf(running_log, "  I = %d\n", cpu.I);
+
       fflush(running_log);
 #endif
       execute_opcode(opcode, &cpu);
