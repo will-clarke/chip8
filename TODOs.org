@@ -4,4 +4,8 @@
 ** timer!!!
 ** display fps in curses???
 *** calculate fps
-** Actually wipe display screen on 00E0
+
+* Display
+** display function: does it xor propertly? Surely only xor if it only appears on the screen??? If it already exists. Otherwie a straight collision == setting an image
+  // N.B These individual BITS from the mem[I] location should get put to display.
+  // So we should do something funky with >>2, >>3, >>4, etc... to isolate the bits.

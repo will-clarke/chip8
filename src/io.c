@@ -84,12 +84,13 @@ void process_keyboard_input(struct cpu* cpu){
 
 void output_display(WINDOW * window, struct cpu* cpu){
   clear();
-  for(int i = 0; i < (int)sizeof(cpu->display); i++){
-    if(cpu->display[i])
-      mvwaddch(window, i / DISPLAY_H, i % DISPLAY_W, '#');
-                             /* y, x */
+  // 0x00E0 = clear screen
+  if(cpu->current_opcode != 0x00E0){
+    for(int i = 0; i < (int)sizeof(cpu->display); i++){
+      if(cpu->display[i])
+        mvwaddch(window, i / DISPLAY_H, i % DISPLAY_W, '█');
+      /* y, x */
+    }
+    refresh();
   }
-  refresh();
-  if(cpu->current_opcode == 0x00E0)
-    clear();
 }

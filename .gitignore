@@ -2,3 +2,4 @@ a.out
 *.o
 chip8
 */test
+*.org_archive

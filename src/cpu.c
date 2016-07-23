@@ -53,7 +53,7 @@ int stack_pop(struct stack* stack){
   if(stack->stack_pointer > 0)
     return *(stack->stack + --stack->stack_pointer);
   else {
-    // printf("Empty Stack Popped\n");
+    printf("Empty Stack Popped\n");
     exit(1);
   }
 }
@@ -65,7 +65,7 @@ int stack_push(struct stack* stack, uint16_t n){
     return 1;
   }
   else {
-    // printf("Stack Overflow!\n");
+    printf("Stack Overflow!\n");
     exit(1);
   }
 }

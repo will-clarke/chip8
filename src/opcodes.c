@@ -60,6 +60,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
         case(0x00EE):
           cpu->pc = stack_pop(&(cpu->stack));
+          cpu->pc += 2; // to move past the CALL opcode
 #ifdef DEBUG
           fprintf(running_log, "    returning from subroutine: stack popped");
 #endif
@@ -340,6 +341,10 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
            pixels to be erased, VF is set to 1, otherwise it is set to 0.
            If the sprite is positioned so part of it is outside the coordinates
            of the display, it wraps around to the opposite side of the screen.*/
+
+
+        // N.B These individual BITS from the mem[I] location should get put to display.
+        // So we should do something funky with >>2, >>3, >>4, etc... to isolate the bits.
         uint8_t x = cpu->V[(opcode & 0x0F00) >> 8];
         uint8_t y = cpu->V[(opcode & 0x00F0) >> 4];
         uint8_t n = (opcode & 0x000F);
@@ -419,6 +424,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           uint8_t x = (opcode & 0x0F00) >> 8;
           uint8_t key_number = 0;
           uint8_t key_value = 0;
+          // dunno if I should be zeroing out the whole keyboard. Meh...
+          for(int i = 0; i < 0x10; i++)
+            cpu->keyboard[i] = 0;
           for(;;){
             if((key_value = cpu->keyboard[key_number])){
               cpu->V[x] = key_number;
