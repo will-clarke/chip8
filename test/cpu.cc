@@ -14,7 +14,7 @@ TEST(CpuTests, InitCpu) {
   struct cpu cpu;
   init_cpu(&cpu);
   EXPECT_EQ(cpu.I, 0);
-  EXPECT_EQ(cpu.pc, (uint8_t)0x2000);
+  EXPECT_EQ(cpu.pc, (uint16_t)0x200);
   EXPECT_EQ(cpu.delay_timer, 0);
   EXPECT_EQ(cpu.sound_timer, 0);
   EXPECT_EQ(*(cpu.stack.stack + 15), 0);

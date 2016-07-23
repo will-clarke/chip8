@@ -12,16 +12,16 @@ void load_rom(struct cpu* cpu, int argc, char *argv[]){
     exit(0);
   }
   char *rom_name = argv[1];
-  const char *dir_path = "roms/\0";
-  uint8_t char_count = strlen(rom_name) + strlen(dir_path);
-  char file_path[char_count];
-  strcpy(file_path, dir_path);
-  strcat(file_path, rom_name);
-  const char * filename = file_path;
-  FILE *rom = fopen(filename, "rb");
+  /* const char *dir_path = "roms/\0"; */
+  /* uint8_t char_count = strlen(rom_name) + strlen(dir_path); */
+  /* char file_path[char_count]; */
+  /* strcpy(file_path, dir_path); */
+  /* strcat(file_path, rom_name); */
+  /* const char * filename = file_path; */
+  FILE *rom = fopen(rom_name, "rb");
     if(rom == NULL){
       printf("OMG. No file pointer to rom!\n");
-      printf("Rom filename = %s\n", filename);
+      printf("Rom filename = %s\n", rom_name);
       exit(1);
     }
   char byte;
@@ -90,4 +90,6 @@ void output_display(WINDOW * window, struct cpu* cpu){
                              /* y, x */
   }
   refresh();
+  if(cpu->current_opcode == 0x00E0)
+    clear();
 }

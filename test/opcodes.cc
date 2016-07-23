@@ -47,11 +47,11 @@ TEST(OpCodeTest, 0x3000)
   init_cpu(&cpu);
   cpu.pc = 0;
   execute_opcode(0x3323, &cpu);
-  EXPECT_EQ(cpu.pc, 1);
+  EXPECT_EQ(cpu.pc, 2);
   cpu.pc = 0;
   cpu.V[3] = 0x23;
   execute_opcode(0x3323, &cpu);
-  EXPECT_EQ(cpu.pc, 2);
+  EXPECT_EQ(cpu.pc, 4);
 }
 
 TEST(OpCodeTest, 0x4000)
@@ -60,11 +60,11 @@ TEST(OpCodeTest, 0x4000)
   init_cpu(&cpu);
   cpu.pc = 0;
   execute_opcode(0x4123, &cpu);
-  EXPECT_EQ(cpu.pc, 2); // Not equal so jump 2
+  EXPECT_EQ(cpu.pc, 4); // Not equal so jump 2
   cpu.pc = 0;
   cpu.V[1] = 0x23;
   execute_opcode(0x4123, &cpu);
-  EXPECT_EQ(cpu.pc, 1); // Equal so jump 1
+  EXPECT_EQ(cpu.pc, 2); // Equal so jump 1
 }
 
 TEST(OpCodeTest, 0x5xy0){
@@ -73,12 +73,12 @@ TEST(OpCodeTest, 0x5xy0){
   cpu.pc = 0;
   execute_opcode(0x5120, &cpu);
   // V[1] == v[2]
-  EXPECT_EQ(cpu.pc, 2);
+  EXPECT_EQ(cpu.pc, 4);
   cpu.pc = 0;
   cpu.V[2] = 99;
   execute_opcode(0x5120, &cpu);
   // V[1] != v[2]
-  EXPECT_EQ(cpu.pc, 1);
+  EXPECT_EQ(cpu.pc, 2);
 }
 
 TEST(OpCodeTest, 0x6xkk){
@@ -236,12 +236,12 @@ TEST(OpCodeTest, 0x9xy0){
   cpu.pc = 0;
   execute_opcode(0x9B80, &cpu);
   //equal so don't skip
-  EXPECT_EQ(cpu.pc, 1);
+  EXPECT_EQ(cpu.pc, 2);
   cpu.V[0x8] = 41;
   cpu.pc = 0;
   execute_opcode(0x9B80, &cpu);
   //not equal so skip pc + 2
-  EXPECT_EQ(cpu.pc, 2);
+  EXPECT_EQ(cpu.pc, 4);
 }
 
 TEST(OpCodeTest, 0xAnnn){
@@ -341,12 +341,12 @@ TEST(OpCodeTest, 0xEx9E){
   cpu.pc = 0;
   execute_opcode(0xE59E, &cpu);
   // Not pressed so don't skip
-  EXPECT_EQ(cpu.pc, 1);
+  EXPECT_EQ(cpu.pc, 2);
   cpu.keyboard[5] = 1;
   cpu.pc = 0;
   execute_opcode(0xE59E, &cpu);
   // Pressed so skip
-  EXPECT_EQ(cpu.pc, 2);
+  EXPECT_EQ(cpu.pc, 4);
 }
 
 
@@ -355,11 +355,11 @@ TEST(OpCodeTest, 0xExA1){
   init_cpu(&cpu);
   cpu.pc = 0;
   execute_opcode(0xE5A1, &cpu);
-  EXPECT_EQ(cpu.pc, 2);
+  EXPECT_EQ(cpu.pc, 4);
   cpu.keyboard[0x5] = 1;
   cpu.pc = 0;
   execute_opcode(0xE5A1, &cpu);
-  EXPECT_EQ(cpu.pc, 1);
+  EXPECT_EQ(cpu.pc, 2);
 }
 
 TEST(OpCodeTest, 0xFx07){
@@ -481,15 +481,12 @@ TEST(OpCodeTest, 0xFx65){
   EXPECT_EQ(cpu.V[3], '!');
 }
 
-
-
-
-
-TEST(OpCodeTest, 0x00E0)
-{
-  struct cpu cpu;
-  memset(cpu.display, 'z', (int)sizeof(cpu.display));
-  execute_opcode(0x00E0, &cpu);
-  EXPECT_EQ(*cpu.display, 0);
-  EXPECT_EQ(*(cpu.display + (int)sizeof(cpu.display) - 1), 0);
-}
+// Display: shouldn't mess with our display memory
+// TEST(OpCodeTest, 0x00E0)
+// {
+//   struct cpu cpu;
+//   memset(cpu.display, 'z', (int)sizeof(cpu.display));
+//   execute_opcode(0x00E0, &cpu);
+//   EXPECT_EQ(*cpu.display, 0);
+//   EXPECT_EQ(*(cpu.display + (int)sizeof(cpu.display) - 1), 0);
+// }

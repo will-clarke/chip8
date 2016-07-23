@@ -26,6 +26,7 @@ struct cpu
 #ifdef DEBUG
   struct step stepping;          // Do we want to step through bit by bit?
 #endif
+  uint16_t current_opcode;
   uint8_t display[0x20 * 0x40];  // 32 * 64
   uint8_t keyboard[0x10];        // 16
 

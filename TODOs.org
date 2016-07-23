@@ -1,5 +1,5 @@
 * Chip8 Todo List
 ** configure keyboard input
 ** configure ncurses
-** clear screen opcode
+
 ** timer!!!

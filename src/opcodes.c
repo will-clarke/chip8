@@ -29,8 +29,11 @@ void increment_pc(struct cpu* cpu, int n){
 
 void execute_opcode(uint16_t opcode, struct cpu* cpu)
 {
+  cpu->current_opcode = opcode;
 #ifdef DEBUG
   dump_memory(cpu);
+  FILE* running_log = fopen("running_log.log", "wa");
+  fprintf(running_log, "* Executing %4x", opcode);
 #endif
   switch(opcode & 0xF000)
     {
@@ -45,8 +48,12 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* Clear the display. */
         case(0x00E0):
           /* memset(cpu->display, 0, sizeof(cpu->display)); */
-          clear_screen();
+          /* clear_screen(); */
+          // handled in io::output_display
           increment_pc(cpu, 1);
+#ifdef DEBUG
+          fprintf(running_log, "    clearing screen");
+#endif
           break;
 
           /* 00EE - RET */
@@ -54,6 +61,9 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
         case(0x00EE):
           cpu->pc = stack_pop(&(cpu->stack));
+#ifdef DEBUG
+          fprintf(running_log, "    returning from subroutine: stack popped");
+#endif
           break;
         }
       break;

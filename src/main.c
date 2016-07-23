@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
       execute_opcode(opcode, &cpu);
       output_display(window, &cpu);
       decrease_timers(&cpu);
-      usleep(100);
+      usleep(10);
     }
   end_ncurses();
 }

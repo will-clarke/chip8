@@ -5,8 +5,18 @@
 void dump_memory(struct cpu* cpu)
 {
   FILE *log = fopen("memory_dump.log", "w");
+
+  fprintf(log, "Current Opcode: %x\n\n", cpu->current_opcode);
+  fprintf(log, "Stack\n===========================\n");
+  for(int i = 0; i < (int)sizeof(cpu->stack.stack); i += 2){
+    fprintf(log, " %3.d: %04x", i, (cpu->stack.stack[i]) << 8 | cpu->stack.stack[i+1]);
+    if(cpu->stack.stack_pointer == i)
+      fprintf(log, " <------ Current Stack Pointer");
+    fprintf(log, "\n");
+  }
+  fprintf(log, "Registers\n===========================\n");
   for(int i = 0; i < (int)sizeof(cpu->V); i++)
-    fprintf(log, "Register %4.d: %04x\n", i, *(cpu->V + i));
+    fprintf(log, "  %4.d: %04x\n", i, *(cpu->V + i));
   fprintf(log, "\n===============================\n\nDisplay\n---------\n\n");
   for(int i = 0; i < (int)sizeof(cpu->display); i += 64){
     /* fprintf(log, "\n - %d / %d\n", i, ((int)sizeof(cpu->display) / 64); */
@@ -16,12 +26,6 @@ void dump_memory(struct cpu* cpu)
     }
     fprintf(log, "\n");
   }
-  fprintf(log, "\n===============================\n\n");
-  fprintf(log, "\n===============================\n\n");
-    for(int i = 0; i < (int)sizeof(cpu->display); i += 2 ){
-      uint16_t byte = get_byte(cpu->display, (uint16_t)i);
-      fprintf(log, "DISPLAY %4.d : %04x\n", i, byte);
-    }
   fprintf(log, "\n===============================\n\n");
   for(int i = 0; i < (int)sizeof(cpu->memory); i += 2 ){
     uint16_t byte = get_byte(cpu->memory, (uint16_t)i);

@@ -5,7 +5,7 @@ TEST(IOTests, IO)
 {
   struct cpu cpu;
   init_cpu(&cpu);
-  char *argv[] = {(char*)"./cpip8", (char*)"PONG"};
+  char *argv[] = {(char*)"./chip8", (char*)"../roms/PONG"};
   load_rom(&cpu, 2, argv);
   EXPECT_EQ(cpu.memory[0x200 + 0], 0x6A );
   EXPECT_EQ(cpu.memory[0x200 + 1], 0x02 );
