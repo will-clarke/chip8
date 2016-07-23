@@ -47,8 +47,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* 00E0 - CLS */
           /* Clear the display. */
         case(0x00E0):
-          /* memset(cpu->display, 0, sizeof(cpu->display)); */
-          /* clear_screen(); */
+          memset(cpu->display, 0, sizeof(cpu->display));
           // handled in io::output_display
           increment_pc(cpu, 1);
 #ifdef DEBUG

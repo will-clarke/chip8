@@ -1,5 +1,7 @@
 * Chip8 Todo List
-** configure keyboard input
 ** configure ncurses
 
 ** timer!!!
+** display fps in curses???
+*** calculate fps
+** Actually wipe display screen on 00E0

@@ -481,12 +481,11 @@ TEST(OpCodeTest, 0xFx65){
   EXPECT_EQ(cpu.V[3], '!');
 }
 
-// Display: shouldn't mess with our display memory
-// TEST(OpCodeTest, 0x00E0)
-// {
-//   struct cpu cpu;
-//   memset(cpu.display, 'z', (int)sizeof(cpu.display));
-//   execute_opcode(0x00E0, &cpu);
-//   EXPECT_EQ(*cpu.display, 0);
-//   EXPECT_EQ(*(cpu.display + (int)sizeof(cpu.display) - 1), 0);
-// }
+TEST(OpCodeTest, 0x00E0)
+{
+  struct cpu cpu;
+  memset(cpu.display, 'z', (int)sizeof(cpu.display));
+  execute_opcode(0x00E0, &cpu);
+  EXPECT_EQ(*cpu.display, 0);
+  EXPECT_EQ(*(cpu.display + (int)sizeof(cpu.display) - 1), 0);
+}
