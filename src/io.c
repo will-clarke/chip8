@@ -53,27 +53,24 @@ void process_keyboard_input(struct cpu* cpu, WINDOW* window){
   for(int i = 0; i < 0x10; i++)
     cpu->keyboard[i] = 0;
 
-  /* initscr(); */
   char input = getch();
-  /* char input = 'w'; */
-  /* char input; */
   switch(input){
-  case('1'): cpu->keyboard[0x1] = 1; break;
-  case('2'): cpu->keyboard[0x2] = 1; break;
+  case('1'): cpu->keyboard[0x0] = 1; break;
+  case('2'): cpu->keyboard[0x1] = 1; break;
   case('3'): cpu->keyboard[0x2] = 1; break;
-  case('4'): cpu->keyboard[0x2] = 1; break;
-  case('q'): cpu->keyboard[0x2] = 1; break;
-  case('w'): cpu->keyboard[0x2] = 1; break;
-  case('e'): cpu->keyboard[0x2] = 1; break;
-  case('r'): cpu->keyboard[0x2] = 1; break;
-  case('a'): cpu->keyboard[0x2] = 1; break;
-  case('s'): cpu->keyboard[0x2] = 1; break;
-  case('d'): cpu->keyboard[0x2] = 1; break;
-  case('f'): cpu->keyboard[0x2] = 1; break;
-  case('z'): cpu->keyboard[0x2] = 1; break;
-  case('x'): cpu->keyboard[0x2] = 1; break;
-  case('c'): cpu->keyboard[0x2] = 1; break;
-  case('v'): cpu->keyboard[0x2] = 1; break;
+  case('4'): cpu->keyboard[0x3] = 1; break;
+  case('q'): cpu->keyboard[0x4] = 1; break;
+  case('w'): cpu->keyboard[0x5] = 1; break;
+  case('e'): cpu->keyboard[0x6] = 1; break;
+  case('r'): cpu->keyboard[0x7] = 1; break;
+  case('a'): cpu->keyboard[0x8] = 1; break;
+  case('s'): cpu->keyboard[0x9] = 1; break;
+  case('d'): cpu->keyboard[0xA] = 1; break;
+  case('f'): cpu->keyboard[0xB] = 1; break;
+  case('z'): cpu->keyboard[0xC] = 1; break;
+  case('x'): cpu->keyboard[0xD] = 1; break;
+  case('c'): cpu->keyboard[0xE] = 1; break;
+  case('v'): cpu->keyboard[0xF] = 1; break;
   case(27):
   case('*'): end_ncurses(); exit(0);
   }
@@ -87,33 +84,5 @@ void output_display(struct cpu* cpu, WINDOW* window){
     for(int x = 0; x < 64; x++)
       addch(cpu->display[y * 64 + x] ? ' ' | A_REVERSE : ' ');
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /* unsigned char x, y; */
-  /* for(y  = 0; y < 32; x++){ */
-  /*     for(x  = 0; x < 64; x++) */
-  /*       mvaddch(y, x, cpu->display[x + y] ? ' ' | A_REVERSE : ' '); */
-  /*     } */
-
-  /* unsigned char j, i; */
-  /* for (j = 0; j < 32; j++) { */
-  /*   move(j, 0); */
-  /*   for (i = 0; i < 64; i++) { */
-  /*     addch(cpu->display[32 * i + j] ? ' ' | A_REVERSE : ' '); */
-  /*   } */
-  /* } */
   refresh();
-
-
 }

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   for(;;)
     {
       process_keyboard_input(&cpu, window);
-      uint16_t opcode = get_byte(cpu.memory, cpu.pc);
+      uint16_t opcode = get_opcode(cpu.memory, cpu.pc);
       execute_opcode(opcode, &cpu);
       output_display(&cpu, window);
       decrease_timers(&cpu);

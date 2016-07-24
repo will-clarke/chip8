@@ -20,14 +20,17 @@ void dump_memory(struct cpu* cpu)
   for(int i = 0; i < (int)sizeof(cpu->V); i++)
     fprintf(log, "  %4.d: %04x\n", i, *(cpu->V + i));
 
-  fprintf(log, "\n\nDisplay\n---------\n\n");
+  fprintf(log, "\n\nKeyboard\n---------\n\n");
+  for (int i = 0; i < 0xF; i++) { // rows
+    fprintf(log, "  key %d: %d\n", i, cpu->keyboard[i]);
+  }
 
-  // [[.........][.........][......]..]
-  for (int j = 0; j < 32; j++) { // rows
-    for (int i = 0; i < 64; i++) // cols
-      fprintf(log, "%c", cpu->display[(32 * i) + j] ? '#' : ' ');
+  fprintf(log, "\n\nDisplay\n---------\n\n");
+  for (int j = 0; j < 32; j++) {
+    for (int i = 0; i < 64; i++)
+      fprintf(log, "%c", cpu->display[(64 * j) + i] ? '#' : ' ');
     fprintf(log, "\n");
-    }
+  }
 
   /* for(int i = 0; i < (int)sizeof(cpu->display); i += 32){ */
   /*   /\* fprintf(log, "\n - %d / %d\n", i, ((int)sizeof(cpu->display) / 64); *\/ */
@@ -38,9 +41,9 @@ void dump_memory(struct cpu* cpu)
   /*   fprintf(log, "\n"); */
   /* } */
 
-  fprintf(log, "\nMemory\n===============================\n\n");
+  fprintf(log, "\n\n\nMemory\n===============================\n\n");
   for(int i = 0; i < (int)sizeof(cpu->memory); i += 2 ){
-    uint16_t byte = get_byte(cpu->memory, (uint16_t)i);
+    uint16_t byte = get_opcode(cpu->memory, (uint16_t)i);
     fprintf(log, " byte # %4.d : %04x\n", i, byte);
   }
 

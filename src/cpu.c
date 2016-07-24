@@ -70,7 +70,7 @@ int stack_push(struct stack* stack, uint16_t n){
   }
 }
 
-uint16_t get_byte(uint8_t *memory, uint16_t pointer_to_memory)
+uint16_t get_opcode(uint8_t *memory, uint16_t pointer_to_memory)
 {
   return *(memory + pointer_to_memory) << 8 | *(memory + pointer_to_memory + 1);
 }

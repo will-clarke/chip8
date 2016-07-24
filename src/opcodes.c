@@ -380,9 +380,10 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
              currently in the down position,
              PC is increased by 2. */
           uint8_t x = (opcode & 0x0F00) >> 8;
-          if (cpu->keyboard[x])
+          if (cpu->keyboard[x]){
             // if key is pressed
             increment_pc(cpu, 2);
+          }
           else
             increment_pc(cpu, 1);
           break;

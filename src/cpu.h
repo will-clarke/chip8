@@ -38,7 +38,7 @@ struct cpu
 
 void init_cpu(struct cpu* cpu);
 
-uint16_t get_byte(uint8_t *memory, uint16_t pointer_to_memory);
+uint16_t get_opcode(uint8_t *memory, uint16_t pointer_to_memory);
 
 
 void decrease_timers(struct cpu* cpu);
