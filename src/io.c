@@ -80,15 +80,39 @@ void process_keyboard_input(struct cpu* cpu, WINDOW* window){
 }
 
 void output_display(struct cpu* cpu, WINDOW* window){
-
-  unsigned char i, j;
-
-  for (j = 0; j < 32; j++) {
-    move(j, 0);
-    for (i = 0; i < 64; i++) {
-      addch(cpu->display[32 * i + j] ? ' ' | A_REVERSE : ' ');
-    }
+  //   row1, row2
+  // [[64..],[64..]...]
+  for(int y = 0; y < 32; y++){
+    move(y, 0);
+    for(int x = 0; x < 64; x++)
+      addch(cpu->display[y * 64 + x] ? ' ' | A_REVERSE : ' ');
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* unsigned char x, y; */
+  /* for(y  = 0; y < 32; x++){ */
+  /*     for(x  = 0; x < 64; x++) */
+  /*       mvaddch(y, x, cpu->display[x + y] ? ' ' | A_REVERSE : ' '); */
+  /*     } */
+
+  /* unsigned char j, i; */
+  /* for (j = 0; j < 32; j++) { */
+  /*   move(j, 0); */
+  /*   for (i = 0; i < 64; i++) { */
+  /*     addch(cpu->display[32 * i + j] ? ' ' | A_REVERSE : ' '); */
+  /*   } */
+  /* } */
   refresh();
 
 
