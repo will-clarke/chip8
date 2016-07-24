@@ -12,7 +12,7 @@ OBJFILES  = $(patsubst $(SRCDIR)%.c,$(BUILDDIR)%.o,$(SRCFILES))
 
 all: $(TARGET)
 
-$(TARGET): make_build_dir $(OBJFILES) #make_build_dir $(OBJFILES)
+$(TARGET): clean make_build_dir $(OBJFILES) #make_build_dir $(OBJFILES)
 	$(CC) $(CFLAGS) $(DEBUG) -o $(TARGET) $(OBJFILES) $(LDFLAGS)
 
 debug: DEBUG = -DDEBUG
