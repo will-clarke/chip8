@@ -34,7 +34,7 @@ clean:
 	rm -rf $(TARGET) $(BUILDDIR) *.log test/test
 
 run: $(TARGET)
-	./$(TARGET) roms/PONG
+	./$(TARGET) roms/PONG2
 
 
 .PHONY: test

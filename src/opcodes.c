@@ -32,8 +32,6 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
   cpu->current_opcode = opcode;
 #ifdef DEBUG
   dump_memory(cpu);
-  FILE* running_log = fopen("running_log.log", "wa");
-  fprintf(running_log, "* Executing %4x", opcode);
 #endif
   switch(opcode & 0xF000)
     {
@@ -51,7 +49,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           // handled in io::output_display
           increment_pc(cpu, 1);
 #ifdef DEBUG
-          fprintf(running_log, "    clearing screen");
+          /* fprintf(running_log, "    clearing screen"); */
 #endif
           break;
 
@@ -62,7 +60,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           cpu->pc = stack_pop(&(cpu->stack));
           cpu->pc += 2; // to move past the CALL opcode
 #ifdef DEBUG
-          fprintf(running_log, "    returning from subroutine: stack popped");
+          /* fprintf(running_log, "    returning from subroutine: stack popped"); */
 #endif
           break;
         }

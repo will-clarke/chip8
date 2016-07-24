@@ -3,3 +3,4 @@ a.out
 chip8
 */test
 *.org_archive
+logs/*

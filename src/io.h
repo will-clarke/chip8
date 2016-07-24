@@ -14,7 +14,7 @@
 
 void clear_screen();
 void load_rom(struct cpu* cpu, int argc, char *argv[]);
-void process_keyboard_input(struct cpu* cpu);
+void process_keyboard_input(struct cpu* cpu, WINDOW*);
 WINDOW * setup_ncurses();
 void end_ncurses();
 

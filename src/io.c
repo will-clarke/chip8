@@ -39,6 +39,9 @@ WINDOW * setup_ncurses(){
   noecho();
   cbreak();
   curs_set(0);
+  timeout(00000);
+  keypad(window, TRUE);
+
   return window;
 }
 
@@ -46,16 +49,20 @@ void end_ncurses(){
   endwin();
 }
 
-void process_keyboard_input(struct cpu* cpu){
+void process_keyboard_input(struct cpu* cpu, WINDOW* window){
   for(int i = 0; i < 0x10; i++)
     cpu->keyboard[i] = 0;
+
+  /* initscr(); */
   char input = getch();
+  /* char input = 'w'; */
+  /* char input; */
   switch(input){
   case('1'): cpu->keyboard[0x1] = 1; break;
   case('2'): cpu->keyboard[0x2] = 1; break;
   case('3'): cpu->keyboard[0x2] = 1; break;
   case('4'): cpu->keyboard[0x2] = 1; break;
-  /* case('q'): cpu->keyboard[0x2] = 1; break; */
+  case('q'): cpu->keyboard[0x2] = 1; break;
   case('w'): cpu->keyboard[0x2] = 1; break;
   case('e'): cpu->keyboard[0x2] = 1; break;
   case('r'): cpu->keyboard[0x2] = 1; break;
@@ -67,18 +74,8 @@ void process_keyboard_input(struct cpu* cpu){
   case('x'): cpu->keyboard[0x2] = 1; break;
   case('c'): cpu->keyboard[0x2] = 1; break;
   case('v'): cpu->keyboard[0x2] = 1; break;
-  case('q'):
+  case(27):
   case('*'): end_ncurses(); exit(0);
-#ifdef DEBUG
-  case('='): {
-    if(cpu->stepping.tries> 10){
-      cpu->stepping.stepping = !cpu->stepping.stepping;
-      cpu->stepping.tries = 0;
-        }
-    else
-      cpu->stepping.tries++;
-      }
-#endif
   }
 }
 
