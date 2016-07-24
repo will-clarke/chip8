@@ -344,16 +344,16 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t y = cpu->V[(opcode & 0x00F0) >> 4];
         uint8_t n = (opcode & 0x000F);
 
-        uint8_t  i, j, row, pixel;
+        uint8_t  current_sprite_h, number_of_bits, byte_to_use, pixel;
         uint16_t location;
 
         cpu->V[0xF] = 0;
-        for (i = 0; i < n; i++) {
-          row = cpu->memory[cpu->I + i];
-          for (j = 0; j < 8; j++) {
-            if (!(pixel = row & (0x80 >> j))) continue;
-            if ((location = 32 * (x+ j) + (y+ i)) > (64 * 32)) continue;
-            if (cpu->display[location]) cpu->V[0xF] = 0;
+        for (current_sprite_h = 0; current_sprite_h < n; current_sprite_h++) {
+          byte_to_use = cpu->memory[cpu->I + current_sprite_h];
+          for (number_of_bits = 0; number_of_bits < 8; number_of_bits++) {
+            if (!(pixel = byte_to_use & (0x80 >> number_of_bits))) continue;
+            if ((location = 32 * (x + number_of_bits) + (y + current_sprite_h)) > (64 * 32)) continue;
+            if (cpu->display[location]) cpu->V[0xF] = 1;
             cpu->display[location] ^= 1;
           }
         }

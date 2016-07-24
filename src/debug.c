@@ -21,14 +21,22 @@ void dump_memory(struct cpu* cpu)
     fprintf(log, "  %4.d: %04x\n", i, *(cpu->V + i));
 
   fprintf(log, "\n\nDisplay\n---------\n\n");
-  for(int i = 0; i < (int)sizeof(cpu->display); i += 32){
-    /* fprintf(log, "\n - %d / %d\n", i, ((int)sizeof(cpu->display) / 64); */
-    for(int j = 0; j < 64; j++){
-      /* fprintf(log, "%d / %d\n", (i + j, (int)sizeof(cpu->display)); */
-      fprintf(log, "%d", cpu->display[i + j]);
-    }
+
+  // [[.........][.........][......]..]
+  for (int j = 0; j < 32; j++) { // rows
+    for (int i = 0; i < 64; i++) // cols
+      fprintf(log, "%c", cpu->display[(32 * i) + j] ? '#' : ' ');
     fprintf(log, "\n");
-  }
+    }
+
+  /* for(int i = 0; i < (int)sizeof(cpu->display); i += 32){ */
+  /*   /\* fprintf(log, "\n - %d / %d\n", i, ((int)sizeof(cpu->display) / 64); *\/ */
+  /*   for(int j = 0; j < 64; j++){ */
+  /*     /\* fprintf(log, "%d / %d\n", (i + j, (int)sizeof(cpu->display)); *\/ */
+  /*     fprintf(log, "%d", cpu->display[i + j]); */
+  /*   } */
+  /*   fprintf(log, "\n"); */
+  /* } */
 
   fprintf(log, "\nMemory\n===============================\n\n");
   for(int i = 0; i < (int)sizeof(cpu->memory); i += 2 ){

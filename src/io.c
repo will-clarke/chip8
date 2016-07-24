@@ -39,7 +39,7 @@ WINDOW * setup_ncurses(){
   noecho();
   cbreak();
   curs_set(0);
-  timeout(00000);
+  timeout(00001);
   keypad(window, TRUE);
 
   return window;
