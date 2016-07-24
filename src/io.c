@@ -82,15 +82,17 @@ void process_keyboard_input(struct cpu* cpu){
   }
 }
 
-void output_display(WINDOW * window, struct cpu* cpu){
-  clear();
-  // 0x00E0 = clear screen
-  if(cpu->current_opcode != 0x00E0){
-    for(int i = 0; i < (int)sizeof(cpu->display); i++){
-      if(cpu->display[i])
-        mvwaddch(window, i / DISPLAY_H, i % DISPLAY_W, '█');
-      /* y, x */
+void output_display(struct cpu* cpu, WINDOW* window){
+
+  unsigned char i, j;
+
+  for (j = 0; j < 32; j++) {
+    move(j, 0);
+    for (i = 0; i < 64; i++) {
+      addch(cpu->display[32 * i + j] ? ' ' | A_REVERSE : ' ');
     }
-    refresh();
   }
+  refresh();
+
+
 }

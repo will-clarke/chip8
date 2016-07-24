@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
       fflush(running_log);
 #endif
       execute_opcode(opcode, &cpu);
-      output_display(window, &cpu);
+      output_display(&cpu, window);
       decrease_timers(&cpu);
       usleep(10);
     }

@@ -20,5 +20,5 @@ void end_ncurses();
 
 uint16_t next_opcode(struct cpu* cpu, int n);
 
-void output_display(WINDOW*, struct cpu* cpu);
+void output_display(struct cpu* cpu, WINDOW*);
 #endif

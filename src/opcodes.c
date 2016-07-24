@@ -342,25 +342,27 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
            If the sprite is positioned so part of it is outside the coordinates
            of the display, it wraps around to the opposite side of the screen.*/
 
-
-        // N.B These individual BITS from the mem[I] location should get put to display.
-        // So we should do something funky with >>2, >>3, >>4, etc... to isolate the bits.
         uint8_t x = cpu->V[(opcode & 0x0F00) >> 8];
         uint8_t y = cpu->V[(opcode & 0x00F0) >> 4];
         uint8_t n = (opcode & 0x000F);
-        uint8_t collision = 0;
 
-        for(int i = 0; i < n; i++){
-          uint16_t row = ((y * DISPLAY_W) + (i * DISPLAY_W)) % (DISPLAY_W * DISPLAY_H);
-          uint16_t col = x % DISPLAY_W;
-          uint16_t display_x_y = row + col % (DISPLAY_W * DISPLAY_H);
-          uint16_t memory_for_display = cpu->memory[cpu->I + i];
-          uint8_t the_actual_xor = cpu->display[display_x_y] ^= memory_for_display;
-          uint8_t xor_collision = the_actual_xor != memory_for_display;
-          if(xor_collision)
-            collision = xor_collision;
+        uint8_t  i, j, row, pixel;
+        uint16_t location;
+
+        cpu->V[0xF] = 0;
+        for (i = 0; i < n; i++) {
+          row = cpu->memory[cpu->I + i];
+          for (j = 0; j < 8; j++) {
+            if (!(pixel = row & (0x80 >> j))) continue;
+            if ((location = 32 * (x+ j) + (y+ i)) > (64 * 32)) continue;
+            if (cpu->display[location]) cpu->V[0xF] = 0;
+            cpu->display[location] ^= 1;
+          }
         }
-        cpu->V[0xF] = collision;
+
+
+
+
         increment_pc(cpu, 1);
         break;
       }
