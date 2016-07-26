@@ -9,3 +9,21 @@
 ** display function: does it xor propertly? Surely only xor if it only appears on the screen??? If it already exists. Otherwie a straight collision == setting an image
   // N.B These individual BITS from the mem[I] location should get put to display.
   // So we should do something funky with >>2, >>3, >>4, etc... to isolate the bits.
+
+
+* Debug mode:
+** TODO create disassembler
+*** Add more 'comments'  / pseudo-assembly code to each opcode
+** TODO decent 'step through' logging.
+
+
+* Command line arguments to accept:
+** DONE ./chip8 roms/pong
+   CLOSED: [2016-07-26 Tue 23:50]
+** ./chip8 roms/pong --io ncurses -o pong.asm
+** ./chip8 roms/pong --disassemble -o pong.asm
+** ./chip8 roms/pong --disassemble --output pong.asm
+** ./chip8 roms/pong --version
+** ./chip8 roms/pong --help
+
+*
