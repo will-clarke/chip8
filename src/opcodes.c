@@ -29,6 +29,8 @@ void increment_pc(struct cpu* cpu, int n){
 
 void execute_opcode(uint16_t opcode, struct cpu* cpu)
 {
+  /* for(int i = 0; i <= 0xF; i++) */
+  /*   if(cpu->keyboard[i]) printf("\nKEY %x PRESSED!\n", i); */
   cpu->current_opcode = opcode;
 #ifdef DEBUG
   dump_memory(cpu);
@@ -58,7 +60,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
           /* The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer. */
         case(0x00EE):
           cpu->pc = stack_pop(&(cpu->stack));
-          cpu->pc += 2; // to move past the CALL opcode
+          increment_pc(cpu, 1);
 #ifdef DEBUG
           /* fprintf(running_log, "    returning from subroutine: stack popped"); */
 #endif
@@ -344,7 +346,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
         uint8_t y = cpu->V[(opcode & 0x00F0) >> 4];
         uint8_t n = (opcode & 0x000F);
 
-        uint8_t  current_sprite_h, number_of_bits, byte_to_use, pixel;
+        uint8_t  current_sprite_h, number_of_bits, byte_to_use;
         uint16_t location;
 
         cpu->V[0xF] = 0;
@@ -380,6 +382,7 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
              currently in the down position,
              PC is increased by 2. */
           uint8_t x = (opcode & 0x0F00) >> 8;
+          /* printf(" LOOKIG FOR KEY %x", x); */
           if (cpu->keyboard[x]){
             // if key is pressed
             increment_pc(cpu, 2);
@@ -396,11 +399,15 @@ void execute_opcode(uint16_t opcode, struct cpu* cpu)
              to the value of Vx is currently in the up position,
              PC is increased by 2. */
           uint8_t x = (opcode & 0x0F00) >> 8;
-          if (cpu->keyboard[x])
+          /* printf(" LOOKIG FOR KEY %x", x); */
+          if (cpu->keyboard[x]){
             // if key is pressed
-            increment_pc(cpu, 1);
-          else
+            /* printf(" - pressed\n"); */
+            increment_pc(cpu, 1);}
+          else{
+            /* printf(" - NOT pressed\n"); */
             increment_pc(cpu, 2);
+            }
           break;
         }
         }
