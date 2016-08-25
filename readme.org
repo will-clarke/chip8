@@ -1,0 +1,6 @@
+* Chip-8 Emulator
+
+A C implementation of a [[https://en.wikipedia.org/wiki/CHIP-8][Chip-8]] emulator.
+[[./pong.png]]
+
+I'm also working on a Chip-8 Assembler / Disassembler / Emulator [[https://github.com/wmmc/c8][here]].
