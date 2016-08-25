@@ -3,6 +3,7 @@
 A C implementation of a [[https://en.wikipedia.org/wiki/CHIP-8][Chip-8]] emulator.
 
 This converts 8-bit binary opcodes into instructions for a virtual CPU / stack / registers / timers.
+
 I/O is done using curses.
 
 
