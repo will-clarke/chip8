@@ -8,5 +8,3 @@ I/O is done using curses.
 
 
 [[./pong.png]]
-
-I'm also working on a Chip-8 Assembler / Disassembler / Emulator [[https://github.com/wmmc/c8][here]].
